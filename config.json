@@ -1,0 +1,25 @@
+{
+  "route": {
+    "origin": "AMS",
+    "destination": "DEL",
+    "origin_city": "Amsterdam",
+    "destination_city": "New Delhi"
+  },
+  "dates": {
+    "outbound": ["2026-08-08", "2026-08-09", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14"],
+    "return": ["2026-08-24", "2026-08-25", "2026-08-26", "2026-08-27", "2026-08-28", "2026-08-29", "2026-08-30", "2026-08-31"]
+  },
+  "passengers": { "adults": 1 },
+  "cabin": "economy",
+  "currency": "EUR",
+  "google": {
+    "request_delay_seconds": 1.5,
+    "max_results_per_pair": 4
+  },
+  "kiwi": {
+    "limit": 100
+  },
+  "amadeus": {
+    "max_pairs": 6
+  }
+}

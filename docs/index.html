@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMS ⇄ DEL · Flight Price Tracker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
+<style>
+:root {
+  --surface-1: #fcfcfb;
+  --page: #f9f9f7;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11,11,11,0.10);
+  --good: #006300;
+  --bad: #d03b3b;
+  --s-google: #2a78d6;
+  --s-kiwi: #1baf7a;
+  --s-amadeus: #eda100;
+  --s-travelpayouts: #4a3aa7;
+}
+:root[data-theme="dark"] {
+  --surface-1: #1a1a19;
+  --page: #0d0d0d;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #898781;
+  --grid: #2c2c2a;
+  --axis: #383835;
+  --border: rgba(255,255,255,0.10);
+  --good: #0ca30c;
+  --bad: #e66767;
+  --s-google: #3987e5;
+  --s-kiwi: #199e70;
+  --s-amadeus: #c98500;
+  --s-travelpayouts: #9085e9;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { color-scheme: light; }
+:root[data-theme="dark"] html, :root[data-theme="dark"] { color-scheme: dark; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--page);
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+.wrap { max-width: 1060px; margin: 0 auto; padding: 24px 20px 56px; }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 6px; }
+h1 { font-size: 22px; font-weight: 650; letter-spacing: -0.01em; }
+.sub { color: var(--text-secondary); font-size: 13.5px; margin-top: 3px; }
+.sub .dot { color: var(--text-muted); margin: 0 6px; }
+#themeBtn {
+  background: var(--surface-1); border: 1px solid var(--border); color: var(--text-secondary);
+  border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer;
+}
+.updated { font-size: 12.5px; color: var(--text-muted); margin-bottom: 18px; }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 22px; }
+.tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.tile .label { font-size: 12.5px; color: var(--text-secondary); }
+.tile .value { font-size: 30px; font-weight: 600; margin-top: 2px; }
+.tile.hero .value { font-size: 44px; letter-spacing: -0.02em; }
+.tile .meta { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+.tile .delta { font-size: 13px; font-weight: 600; margin-top: 4px; }
+.delta.down { color: var(--good); }
+.delta.up { color: var(--bad); }
+.delta.flat { color: var(--text-muted); font-weight: 500; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 14px; }
+.filters .flabel { font-size: 12.5px; color: var(--text-muted); margin-right: 2px; }
+.seg { display: inline-flex; background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.seg button {
+  background: none; border: 0; padding: 6px 12px; font: inherit; font-size: 13px;
+  color: var(--text-secondary); cursor: pointer;
+}
+.seg button[aria-pressed="true"] { background: var(--grid); color: var(--text-primary); font-weight: 600; }
+select#pairSel {
+  background: var(--surface-1); border: 1px solid var(--border); color: var(--text-primary);
+  border-radius: 8px; padding: 6px 8px; font: inherit; font-size: 13px;
+}
+
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 22px; }
+.card h2 { font-size: 15px; font-weight: 650; }
+.card .desc { font-size: 12.5px; color: var(--text-muted); margin: 2px 0 12px; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 8px; }
+.legend .key { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); }
+.legend .swatch { width: 16px; height: 0; border-top: 2.5px solid; border-radius: 2px; }
+
+#chartBox { position: relative; }
+#chart { display: block; width: 100%; height: auto; }
+#tooltip {
+  position: absolute; pointer-events: none; display: none; z-index: 5;
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 14px rgba(0,0,0,0.14);
+  min-width: 150px;
+}
+#tooltip .tt-time { color: var(--text-muted); font-size: 11.5px; margin-bottom: 4px; }
+#tooltip .tt-row { display: flex; align-items: center; gap: 7px; margin-top: 2px; }
+#tooltip .tt-key { width: 12px; height: 0; border-top: 2.5px solid; border-radius: 2px; flex: none; }
+#tooltip .tt-val { font-weight: 650; }
+#tooltip .tt-name { color: var(--text-secondary); }
+
+.matrix-scroll { overflow-x: auto; }
+table.matrix { border-collapse: separate; border-spacing: 2px; font-size: 12.5px; }
+table.matrix th { font-weight: 500; color: var(--text-muted); padding: 4px 6px; text-align: center; font-variant-numeric: tabular-nums; }
+table.matrix th.rowh { text-align: right; }
+table.matrix td {
+  min-width: 62px; height: 40px; text-align: center; border-radius: 6px;
+  font-variant-numeric: tabular-nums; cursor: default; position: relative;
+}
+table.matrix td.cheapest { outline: 2px solid var(--text-primary); outline-offset: -2px; font-weight: 700; }
+table.matrix td.empty { background: var(--page); color: var(--text-muted); }
+table.matrix td:hover:not(.empty) { filter: brightness(1.08); }
+.axis-note { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+
+table.deals { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+table.deals th { text-align: left; font-size: 12px; color: var(--text-muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--grid); }
+table.deals td { padding: 9px 10px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+table.deals tr:last-child td { border-bottom: 0; }
+table.deals td.price { font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.srcmark { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
+a.book {
+  display: inline-block; font-size: 12.5px; font-weight: 600; text-decoration: none;
+  color: var(--text-primary); border: 1px solid var(--border); background: var(--page);
+  border-radius: 7px; padding: 4px 10px; white-space: nowrap;
+}
+a.book:hover { background: var(--grid); }
+.muted { color: var(--text-muted); }
+footer { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+footer a { color: var(--text-secondary); }
+#loading { padding: 60px 0; text-align: center; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Amsterdam ⇄ New Delhi · flight price tracker</h1>
+      <div class="sub" id="routeSub">Round trip, economy, 1 adult<span class="dot">·</span>Out Aug 8–14 · Return Aug 24–31, 2026</div>
+    </div>
+    <button id="themeBtn" aria-label="Toggle theme">◐ Theme</button>
+  </header>
+  <div class="updated" id="updated">Loading…</div>
+
+  <div id="loading">Fetching latest prices…</div>
+  <div id="app" style="display:none">
+
+    <div class="tiles" id="tiles"></div>
+
+    <div class="filters">
+      <span class="flabel">History</span>
+      <div class="seg" id="rangeSeg" role="group" aria-label="History range">
+        <button data-range="1">24h</button>
+        <button data-range="7">7d</button>
+        <button data-range="30">30d</button>
+        <button data-range="0" aria-pressed="true">All</button>
+      </div>
+      <span class="flabel" style="margin-left:10px">Dates</span>
+      <select id="pairSel" aria-label="Date pair"><option value="">Best of all date pairs</option></select>
+    </div>
+
+    <div class="card">
+      <h2>Price history</h2>
+      <div class="desc">Cheapest round-trip found by each source at every hourly check (EUR).</div>
+      <div class="legend" id="legend"></div>
+      <div id="chartBox">
+        <svg id="chart" role="img" aria-label="Price history line chart"></svg>
+        <div id="tooltip"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Current prices by date pair</h2>
+      <div class="desc">Cheapest current round-trip across all sources for each outbound (rows) × return (columns) combination. Darker means more expensive; the boxed cell is the best deal.</div>
+      <div class="matrix-scroll"><table class="matrix" id="matrix"></table></div>
+      <div class="axis-note">Rows: outbound date (Aug 2026) · Columns: return date (Aug 2026) · Hover a cell for details.</div>
+    </div>
+
+    <div class="card">
+      <h2>Best current deals</h2>
+      <div class="desc">Top offers from the latest check, cheapest first.</div>
+      <table class="deals" id="deals"></table>
+    </div>
+
+    <footer id="foot"></footer>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const SOURCE_META = {
+  google:        { name: "Google Flights", cssVar: "--s-google" },
+  kiwi:          { name: "Kiwi.com",       cssVar: "--s-kiwi" },
+  amadeus:       { name: "Amadeus",        cssVar: "--s-amadeus" },
+  travelpayouts: { name: "Aviasales",      cssVar: "--s-travelpayouts" },
+};
+// sequential blue ramp (palette steps 100..700) for the price matrix
+const RAMP = ["#cde2fb","#b7d3f6","#9ec5f4","#86b6ef","#6da7ec","#5598e7","#3987e5","#2a78d6","#256abf","#1c5cab","#184f95","#104281","#0d366b"];
+
+let LATEST = null, HISTORY = [], rangeDays = 0, pairFilter = "";
+
+const $ = (id) => document.getElementById(id);
+const fmtEur = (v) => "€" + Math.round(v).toLocaleString("en-US");
+const srcColor = (s) => getComputedStyle(document.documentElement).getPropertyValue((SOURCE_META[s] || {}).cssVar || "--text-muted").trim();
+const dayLabel = (iso) => { const d = new Date(iso + "T12:00:00Z"); return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", timeZone: "UTC" }); };
+const shortDate = (iso) => iso.slice(8); // "2026-08-10" -> "10"
+
+/* ---------- theme ---------- */
+function initTheme() {
+  const saved = localStorage.getItem("theme");
+  const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  $("themeBtn").onclick = () => {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem("theme", next);
+    render();
+  };
+}
+
+/* ---------- data ---------- */
+async function load() {
+  const bust = "?t=" + Math.floor(Date.now() / 60000);
+  const [latest, history] = await Promise.all([
+    fetch("data/latest.json" + bust).then(r => r.json()),
+    fetch("data/history.json" + bust).then(r => r.json()),
+  ]);
+  LATEST = latest; HISTORY = history;
+  $("loading").style.display = "none";
+  $("app").style.display = "";
+  buildPairSelect();
+  render();
+}
+
+function activeSources() {
+  const set = new Set();
+  HISTORY.forEach(h => h.q.forEach(e => set.add(e[0])));
+  (LATEST.quotes || []).forEach(q => set.add(q.source));
+  return Object.keys(SOURCE_META).filter(s => set.has(s));
+}
+
+function buildPairSelect() {
+  const sel = $("pairSel");
+  LATEST.dates.outbound.forEach(o => LATEST.dates.return.forEach(r => {
+    const opt = document.createElement("option");
+    opt.value = o + "|" + r;
+    opt.textContent = "Out " + dayLabel(o) + " → Ret " + dayLabel(r);
+    sel.appendChild(opt);
+  }));
+  sel.onchange = () => { pairFilter = sel.value; render(); };
+}
+
+/* ---------- history series ---------- */
+function seriesData() {
+  // per source: [{t: Date, v: price}], best across pairs (or the selected pair)
+  const cutoff = rangeDays ? Date.now() - rangeDays * 864e5 : 0;
+  const [po, pr] = pairFilter ? pairFilter.split("|") : [null, null];
+  const out = {};
+  for (const run of HISTORY) {
+    const t = new Date(run.t);
+    if (+t < cutoff) continue;
+    const best = {};
+    for (const [src, o, r, price] of run.q) {
+      if (po && (o !== po || r !== pr)) continue;
+      if (!(src in best) || price < best[src]) best[src] = price;
+    }
+    for (const [src, v] of Object.entries(best)) (out[src] = out[src] || []).push({ t, v });
+  }
+  return out;
+}
+
+/* ---------- stat tiles ---------- */
+function renderTiles() {
+  const tiles = $("tiles");
+  tiles.textContent = "";
+  const quotes = LATEST.quotes || [];
+  if (!quotes.length) return;
+  const best = quotes[0]; // sorted by price
+
+  // delta vs ~24h ago (overall best across sources)
+  const dayAgo = Date.now() - 864e5;
+  let prev = null;
+  for (const run of HISTORY) {
+    if (+new Date(run.t) <= dayAgo) prev = run; else break;
+  }
+  const prevBest = prev ? Math.min(...prev.q.map(e => e[3])) : null;
+
+  const hero = document.createElement("div");
+  hero.className = "tile hero";
+  const heroDelta = prevBest == null ? "" :
+    (Math.abs(best.price - prevBest) < 1
+      ? '<div class="delta flat">unchanged vs 24h ago</div>'
+      : '<div class="delta ' + (best.price < prevBest ? "down" : "up") + '">' +
+        (best.price < prevBest ? "▼ " : "▲ ") + fmtEur(Math.abs(best.price - prevBest)) + " vs 24h ago</div>");
+  hero.innerHTML = '<div class="label">Cheapest right now</div><div class="value"></div><div class="meta"></div>' + heroDelta;
+  hero.querySelector(".value").textContent = fmtEur(best.price);
+  hero.querySelector(".meta").textContent =
+    dayLabel(best.out_date) + " → " + dayLabel(best.ret_date) + " · " + (best.airlines || []).join(", ") + " · " + best.source_name;
+  tiles.appendChild(hero);
+
+  for (const src of activeSources()) {
+    const q = quotes.find(x => x.source === src);
+    const tile = document.createElement("div");
+    tile.className = "tile";
+    const label = document.createElement("div"); label.className = "label";
+    const mark = document.createElement("span"); mark.className = "srcmark"; mark.style.background = srcColor(src);
+    label.appendChild(mark); label.appendChild(document.createTextNode(SOURCE_META[src].name));
+    const value = document.createElement("div"); value.className = "value";
+    value.textContent = q ? fmtEur(q.price) : "—";
+    const meta = document.createElement("div"); meta.className = "meta";
+    meta.textContent = q ? dayLabel(q.out_date) + " → " + dayLabel(q.ret_date) : "no data this run";
+    tile.append(label, value, meta);
+    tiles.appendChild(tile);
+  }
+}
+
+/* ---------- line chart ---------- */
+function renderChart() {
+  const svg = $("chart");
+  svg.textContent = "";
+  const data = seriesData();
+  const sources = activeSources().filter(s => (data[s] || []).length);
+  const W = Math.max(svg.clientWidth || $("chartBox").clientWidth, 320);
+  const H = 300, padL = 46, padR = 74, padT = 14, padB = 30;
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.style.height = H + "px";
+
+  const legend = $("legend");
+  legend.textContent = "";
+  if (sources.length > 1) {
+    for (const s of sources) {
+      const k = document.createElement("span"); k.className = "key";
+      const sw = document.createElement("span"); sw.className = "swatch"; sw.style.borderTopColor = srcColor(s);
+      k.appendChild(sw); k.appendChild(document.createTextNode(SOURCE_META[s].name));
+      legend.appendChild(k);
+    }
+  }
+
+  const all = sources.flatMap(s => data[s]);
+  if (!all.length) {
+    const t = mk("text", { x: W / 2, y: H / 2, "text-anchor": "middle", fill: "var(--text-muted)", "font-size": 13 });
+    t.textContent = "No history yet for this selection — check back after a few runs.";
+    svg.appendChild(t);
+    return;
+  }
+  const ts = all.map(d => +d.t), vs = all.map(d => d.v);
+  let t0 = Math.min(...ts), t1 = Math.max(...ts);
+  if (t0 === t1) { t0 -= 36e5; t1 += 36e5; }
+  let v0 = Math.min(...vs), v1 = Math.max(...vs);
+  const span = Math.max(v1 - v0, 20);
+  v0 = Math.max(0, v0 - span * 0.15); v1 += span * 0.15;
+  const x = (t) => padL + (t - t0) / (t1 - t0) * (W - padL - padR);
+  const y = (v) => padT + (1 - (v - v0) / (v1 - v0)) * (H - padT - padB);
+
+  // y grid: clean steps
+  const step = niceStep((v1 - v0) / 4);
+  for (let v = Math.ceil(v0 / step) * step; v <= v1; v += step) {
+    svg.appendChild(mk("line", { x1: padL, x2: W - padR, y1: y(v), y2: y(v), stroke: "var(--grid)", "stroke-width": 1 }));
+    const lbl = mk("text", { x: padL - 8, y: y(v) + 4, "text-anchor": "end", fill: "var(--text-muted)", "font-size": 11, style: "font-variant-numeric:tabular-nums" });
+    lbl.textContent = "€" + v.toLocaleString("en-US");
+    svg.appendChild(lbl);
+  }
+  // x ticks: ~5 time labels
+  const nTicks = Math.min(5, Math.max(2, Math.floor(W / 160)));
+  for (let i = 0; i <= nTicks; i++) {
+    const t = t0 + (t1 - t0) * i / nTicks;
+    const lbl = mk("text", { x: x(t), y: H - 8, "text-anchor": "middle", fill: "var(--text-muted)", "font-size": 11 });
+    lbl.textContent = fmtTick(new Date(t), t1 - t0);
+    svg.appendChild(lbl);
+  }
+  svg.appendChild(mk("line", { x1: padL, x2: W - padR, y1: y(v0), y2: y(v0), stroke: "var(--axis)", "stroke-width": 1 }));
+
+  // series lines + end markers + endpoint labels (skip label on collision)
+  const endYs = [];
+  for (const s of sources) {
+    const pts = data[s];
+    const c = srcColor(s);
+    const d = pts.map((p, i) => (i ? "L" : "M") + x(+p.t).toFixed(1) + " " + y(p.v).toFixed(1)).join(" ");
+    svg.appendChild(mk("path", { d, fill: "none", stroke: c, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+    const last = pts[pts.length - 1];
+    const ly = y(last.v);
+    svg.appendChild(mk("circle", { cx: x(+last.t), cy: ly, r: 4.5, fill: c, stroke: "var(--surface-1)", "stroke-width": 2 }));
+    if (!endYs.some(e => Math.abs(e - ly) < 14)) {
+      const lbl = mk("text", { x: x(+last.t) + 10, y: ly + 4, fill: "var(--text-primary)", "font-size": 12, "font-weight": 650, style: "font-variant-numeric:tabular-nums" });
+      lbl.textContent = fmtEur(last.v);
+      svg.appendChild(lbl);
+      endYs.push(ly);
+    }
+  }
+
+  // crosshair + tooltip
+  const cross = mk("line", { y1: padT, y2: H - padB, stroke: "var(--axis)", "stroke-width": 1, visibility: "hidden" });
+  svg.appendChild(cross);
+  const timesSorted = [...new Set(ts)].sort((a, b) => a - b);
+  const tt = $("tooltip");
+  svg.onpointermove = (ev) => {
+    const rect = svg.getBoundingClientRect();
+    const px = (ev.clientX - rect.left) * (W / rect.width);
+    const tCursor = t0 + (px - padL) / (W - padL - padR) * (t1 - t0);
+    let nearest = timesSorted[0];
+    for (const t of timesSorted) if (Math.abs(t - tCursor) < Math.abs(nearest - tCursor)) nearest = t;
+    cross.setAttribute("x1", x(nearest)); cross.setAttribute("x2", x(nearest));
+    cross.setAttribute("visibility", "visible");
+    tt.textContent = "";
+    const time = document.createElement("div"); time.className = "tt-time";
+    time.textContent = new Date(nearest).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    tt.appendChild(time);
+    for (const s of sources) {
+      const pt = data[s].reduce((acc, p) => Math.abs(+p.t - nearest) < 18e5 && (!acc || Math.abs(+p.t - nearest) < Math.abs(+acc.t - nearest)) ? p : acc, null);
+      if (!pt) continue;
+      const row = document.createElement("div"); row.className = "tt-row";
+      const key = document.createElement("span"); key.className = "tt-key"; key.style.borderTopColor = srcColor(s);
+      const val = document.createElement("span"); val.className = "tt-val"; val.textContent = fmtEur(pt.v);
+      const name = document.createElement("span"); name.className = "tt-name"; name.textContent = SOURCE_META[s].name;
+      row.append(key, val, name);
+      tt.appendChild(row);
+    }
+    tt.style.display = "block";
+    const boxW = tt.offsetWidth, xPix = x(nearest) * (rect.width / W);
+    tt.style.left = Math.min(Math.max(xPix + 14, 0), rect.width - boxW - 4) + "px";
+    tt.style.top = "12px";
+  };
+  svg.onpointerleave = () => { tt.style.display = "none"; cross.setAttribute("visibility", "hidden"); };
+}
+
+function mk(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+function niceStep(raw) {
+  const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+  for (const m of [1, 2, 2.5, 5, 10]) if (raw <= m * pow) return m * pow;
+  return 10 * pow;
+}
+function fmtTick(d, spanMs) {
+  return spanMs < 3 * 864e5
+    ? d.toLocaleString("en-GB", { hour: "2-digit", minute: "2-digit" }) + " · " + d.toLocaleDateString("en-GB", { day: "numeric", month: "short" })
+    : d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
+/* ---------- date-pair matrix ---------- */
+function renderMatrix() {
+  const table = $("matrix");
+  table.textContent = "";
+  const { outbound, return: rets } = LATEST.dates;
+  const best = {}; // "o|r" -> quote
+  for (const q of LATEST.quotes) {
+    const k = q.out_date + "|" + q.ret_date;
+    if (!(k in best) || q.price < best[k].price) best[k] = q;
+  }
+  const prices = Object.values(best).map(q => q.price);
+  if (!prices.length) return;
+  const lo = Math.min(...prices), hi = Math.max(...prices);
+  const dark = document.documentElement.dataset.theme === "dark";
+
+  const thead = document.createElement("tr");
+  thead.appendChild(document.createElement("th"));
+  for (const r of rets) {
+    const th = document.createElement("th");
+    th.textContent = dayLabel(r).replace(" ", " ");
+    thead.appendChild(th);
+  }
+  table.appendChild(thead);
+
+  for (const o of outbound) {
+    const tr = document.createElement("tr");
+    const th = document.createElement("th"); th.className = "rowh"; th.textContent = dayLabel(o);
+    tr.appendChild(th);
+    for (const r of rets) {
+      const td = document.createElement("td");
+      const q = best[o + "|" + r];
+      if (!q) {
+        td.className = "empty"; td.textContent = "·";
+      } else {
+        const frac = hi === lo ? 0 : (q.price - lo) / (hi - lo);
+        // salience = expensive in both modes: light ramp low→high, dark ramp reversed so cheap recedes into the dark surface
+        const idx = Math.round(frac * (RAMP.length - 1));
+        const color = dark ? RAMP[RAMP.length - 1 - idx] : RAMP[idx];
+        td.style.background = color;
+        td.style.color = lum(color) > 0.45 ? "#0b0b0b" : "#ffffff";
+        td.textContent = fmtEur(q.price);
+        if (q.price === lo) td.classList.add("cheapest");
+        td.title = dayLabel(o) + " → " + dayLabel(r) + " · " + fmtEur(q.price) + " · " + (q.airlines || []).join(", ") + " · " + q.source_name;
+      }
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
+  }
+}
+function lum(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return (0.2126 * (n >> 16) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255;
+}
+
+/* ---------- deals table ---------- */
+function renderDeals() {
+  const table = $("deals");
+  table.textContent = "";
+  const seen = new Set();
+  const rows = [];
+  for (const q of LATEST.quotes) {
+    const k = [q.source, q.out_date, q.ret_date, (q.airlines || []).join()].join("|");
+    if (seen.has(k)) continue;
+    seen.add(k);
+    rows.push(q);
+    if (rows.length >= 15) break;
+  }
+  const hr = document.createElement("tr");
+  for (const h of ["Price", "Dates", "Airlines", "Stops", "Duration", "Source", ""]) {
+    const th = document.createElement("th"); th.textContent = h; hr.appendChild(th);
+  }
+  table.appendChild(hr);
+  for (const q of rows) {
+    const tr = document.createElement("tr");
+    const tdP = document.createElement("td"); tdP.className = "price"; tdP.textContent = fmtEur(q.price);
+    const tdD = document.createElement("td"); tdD.textContent = dayLabel(q.out_date) + " → " + dayLabel(q.ret_date);
+    const tdA = document.createElement("td"); tdA.textContent = (q.airlines || []).join(", ") || "—";
+    const tdS = document.createElement("td");
+    tdS.textContent = q.stops_out == null ? "—" : q.stops_out + (q.stops_in == null ? "" : " / " + q.stops_in);
+    const tdT = document.createElement("td");
+    tdT.textContent = q.duration_min ? Math.floor(q.duration_min / 60) + "h " + (q.duration_min % 60) + "m" : "—";
+    const tdSrc = document.createElement("td");
+    const mark = document.createElement("span"); mark.className = "srcmark"; mark.style.background = srcColor(q.source);
+    tdSrc.appendChild(mark); tdSrc.appendChild(document.createTextNode(q.source_name));
+    const tdB = document.createElement("td");
+    if (q.booking_url) {
+      const a = document.createElement("a");
+      a.className = "book"; a.href = q.booking_url; a.target = "_blank"; a.rel = "noopener noreferrer";
+      a.textContent = "Book ↗";
+      tdB.appendChild(a);
+    }
+    tr.append(tdP, tdD, tdA, tdS, tdT, tdSrc, tdB);
+    table.appendChild(tr);
+  }
+}
+
+/* ---------- top-level ---------- */
+function render() {
+  const upd = new Date(LATEST.updated_at);
+  $("updated").textContent = "Last checked " + upd.toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) +
+    " (your time) · checked hourly · " + HISTORY.length + " checks recorded";
+  renderTiles();
+  renderChart();
+  renderMatrix();
+  renderDeals();
+  $("foot").textContent = "Sources: " + activeSources().map(s => SOURCE_META[s].name).join(", ") +
+    ". Prices are the total for 1 adult round trip in EUR and can change by the time you book. Data refreshes hourly via GitHub Actions.";
+}
+
+$("rangeSeg").addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+  rangeDays = Number(btn.dataset.range);
+  for (const b of $("rangeSeg").querySelectorAll("button")) b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+  renderChart();
+});
+addEventListener("resize", () => { if (LATEST) renderChart(); });
+setInterval(() => { if (LATEST) load().catch(() => {}); }, 10 * 60 * 1000);
+
+initTheme();
+load().catch((err) => { $("loading").textContent = "Failed to load data: " + err.message; });
+</script>
+</body>
+</html>
