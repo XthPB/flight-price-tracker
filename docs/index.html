@@ -19,8 +19,10 @@
   --bad: #d03b3b;
   --s-google: #2a78d6;
   --s-kiwi: #1baf7a;
-  --s-amadeus: #eda100;
-  --s-travelpayouts: #4a3aa7;
+  --s-easemytrip: #eda100;
+  --s-easemytrip-student: #4a3aa7;
+  --s-amadeus: #e34948;
+  --s-travelpayouts: #e87ba4;
 }
 :root[data-theme="dark"] {
   --surface-1: #1a1a19;
@@ -35,8 +37,10 @@
   --bad: #e66767;
   --s-google: #3987e5;
   --s-kiwi: #199e70;
-  --s-amadeus: #c98500;
-  --s-travelpayouts: #9085e9;
+  --s-easemytrip: #c98500;
+  --s-easemytrip-student: #9085e9;
+  --s-amadeus: #e66767;
+  --s-travelpayouts: #d55181;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { color-scheme: light; }
@@ -122,6 +126,11 @@ table.deals td { padding: 9px 10px; border-bottom: 1px solid var(--grid); vertic
 table.deals tr:last-child td { border-bottom: 0; }
 table.deals td.price { font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .srcmark { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
+.badge {
+  display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em;
+  color: var(--text-secondary); border: 1px solid var(--border); border-radius: 5px;
+  padding: 1px 6px; margin-left: 7px; vertical-align: 1px; text-transform: uppercase;
+}
 a.book {
   display: inline-block; font-size: 12.5px; font-weight: 600; text-decoration: none;
   color: var(--text-primary); border: 1px solid var(--border); background: var(--page);
@@ -139,7 +148,7 @@ footer a { color: var(--text-secondary); }
   <header>
     <div>
       <h1>Amsterdam ⇄ New Delhi · flight price tracker</h1>
-      <div class="sub" id="routeSub">Round trip, economy, 1 adult<span class="dot">·</span>Out Aug 8–14 · Return Aug 24–31, 2026</div>
+      <div class="sub" id="routeSub">Round trip, economy, 1 adult, prices in ₹ INR<span class="dot">·</span>Out Aug 8–14 · Return Aug 24–31, 2026<span class="dot">·</span>Includes student fares</div>
     </div>
     <button id="themeBtn" aria-label="Toggle theme">◐ Theme</button>
   </header>
@@ -164,7 +173,7 @@ footer a { color: var(--text-secondary); }
 
     <div class="card">
       <h2>Price history</h2>
-      <div class="desc">Cheapest round-trip found by each source at every hourly check (EUR).</div>
+      <div class="desc">Cheapest round-trip found by each source at every hourly check (₹ INR).</div>
       <div class="legend" id="legend"></div>
       <div id="chartBox">
         <svg id="chart" role="img" aria-label="Price history line chart"></svg>
@@ -193,10 +202,12 @@ footer a { color: var(--text-secondary); }
 "use strict";
 
 const SOURCE_META = {
-  google:        { name: "Google Flights", cssVar: "--s-google" },
-  kiwi:          { name: "Kiwi.com",       cssVar: "--s-kiwi" },
-  amadeus:       { name: "Amadeus",        cssVar: "--s-amadeus" },
-  travelpayouts: { name: "Aviasales",      cssVar: "--s-travelpayouts" },
+  google:                { name: "Google Flights",       cssVar: "--s-google" },
+  kiwi:                  { name: "Kiwi.com",             cssVar: "--s-kiwi" },
+  easemytrip:            { name: "EaseMyTrip",           cssVar: "--s-easemytrip" },
+  "easemytrip-student":  { name: "EaseMyTrip · Student", cssVar: "--s-easemytrip-student" },
+  amadeus:               { name: "Amadeus",              cssVar: "--s-amadeus" },
+  travelpayouts:         { name: "Aviasales",            cssVar: "--s-travelpayouts" },
 };
 // sequential blue ramp (palette steps 100..700) for the price matrix
 const RAMP = ["#cde2fb","#b7d3f6","#9ec5f4","#86b6ef","#6da7ec","#5598e7","#3987e5","#2a78d6","#256abf","#1c5cab","#184f95","#104281","#0d366b"];
@@ -204,7 +215,10 @@ const RAMP = ["#cde2fb","#b7d3f6","#9ec5f4","#86b6ef","#6da7ec","#5598e7","#3987
 let LATEST = null, HISTORY = [], rangeDays = 0, pairFilter = "";
 
 const $ = (id) => document.getElementById(id);
-const fmtEur = (v) => "€" + Math.round(v).toLocaleString("en-US");
+const CURRENCIES = { INR: { sym: "₹", locale: "en-IN" }, EUR: { sym: "€", locale: "en-US" }, USD: { sym: "$", locale: "en-US" } };
+let CUR = CURRENCIES.INR;
+const fmtMoney = (v) => CUR.sym + Math.round(v).toLocaleString(CUR.locale);
+const fmtCompact = (v) => v >= 10000 ? CUR.sym + (v / 1000).toFixed(v >= 100000 ? 0 : 1) + "k" : fmtMoney(v);
 const srcColor = (s) => getComputedStyle(document.documentElement).getPropertyValue((SOURCE_META[s] || {}).cssVar || "--text-muted").trim();
 const dayLabel = (iso) => { const d = new Date(iso + "T12:00:00Z"); return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", timeZone: "UTC" }); };
 const shortDate = (iso) => iso.slice(8); // "2026-08-10" -> "10"
@@ -230,6 +244,7 @@ async function load() {
     fetch("data/history.json" + bust).then(r => r.json()),
   ]);
   LATEST = latest; HISTORY = history;
+  CUR = CURRENCIES[latest.currency] || CURRENCIES.INR;
   $("loading").style.display = "none";
   $("app").style.display = "";
   buildPairSelect();
@@ -295,9 +310,9 @@ function renderTiles() {
     (Math.abs(best.price - prevBest) < 1
       ? '<div class="delta flat">unchanged vs 24h ago</div>'
       : '<div class="delta ' + (best.price < prevBest ? "down" : "up") + '">' +
-        (best.price < prevBest ? "▼ " : "▲ ") + fmtEur(Math.abs(best.price - prevBest)) + " vs 24h ago</div>");
+        (best.price < prevBest ? "▼ " : "▲ ") + fmtMoney(Math.abs(best.price - prevBest)) + " vs 24h ago</div>");
   hero.innerHTML = '<div class="label">Cheapest right now</div><div class="value"></div><div class="meta"></div>' + heroDelta;
-  hero.querySelector(".value").textContent = fmtEur(best.price);
+  hero.querySelector(".value").textContent = fmtMoney(best.price);
   hero.querySelector(".meta").textContent =
     dayLabel(best.out_date) + " → " + dayLabel(best.ret_date) + " · " + (best.airlines || []).join(", ") + " · " + best.source_name;
   tiles.appendChild(hero);
@@ -310,7 +325,7 @@ function renderTiles() {
     const mark = document.createElement("span"); mark.className = "srcmark"; mark.style.background = srcColor(src);
     label.appendChild(mark); label.appendChild(document.createTextNode(SOURCE_META[src].name));
     const value = document.createElement("div"); value.className = "value";
-    value.textContent = q ? fmtEur(q.price) : "—";
+    value.textContent = q ? fmtMoney(q.price) : "—";
     const meta = document.createElement("div"); meta.className = "meta";
     meta.textContent = q ? dayLabel(q.out_date) + " → " + dayLabel(q.ret_date) : "no data this run";
     tile.append(label, value, meta);
@@ -325,7 +340,7 @@ function renderChart() {
   const data = seriesData();
   const sources = activeSources().filter(s => (data[s] || []).length);
   const W = Math.max(svg.clientWidth || $("chartBox").clientWidth, 320);
-  const H = 300, padL = 46, padR = 74, padT = 14, padB = 30;
+  const H = 300, padL = 56, padR = 86, padT = 14, padB = 30;
   svg.setAttribute("viewBox", "0 0 " + W + " " + H);
   svg.style.height = H + "px";
 
@@ -361,7 +376,7 @@ function renderChart() {
   for (let v = Math.ceil(v0 / step) * step; v <= v1; v += step) {
     svg.appendChild(mk("line", { x1: padL, x2: W - padR, y1: y(v), y2: y(v), stroke: "var(--grid)", "stroke-width": 1 }));
     const lbl = mk("text", { x: padL - 8, y: y(v) + 4, "text-anchor": "end", fill: "var(--text-muted)", "font-size": 11, style: "font-variant-numeric:tabular-nums" });
-    lbl.textContent = "€" + v.toLocaleString("en-US");
+    lbl.textContent = fmtCompact(v);
     svg.appendChild(lbl);
   }
   // x ticks: ~5 time labels
@@ -386,7 +401,7 @@ function renderChart() {
     svg.appendChild(mk("circle", { cx: x(+last.t), cy: ly, r: 4.5, fill: c, stroke: "var(--surface-1)", "stroke-width": 2 }));
     if (!endYs.some(e => Math.abs(e - ly) < 14)) {
       const lbl = mk("text", { x: x(+last.t) + 10, y: ly + 4, fill: "var(--text-primary)", "font-size": 12, "font-weight": 650, style: "font-variant-numeric:tabular-nums" });
-      lbl.textContent = fmtEur(last.v);
+      lbl.textContent = fmtMoney(last.v);
       svg.appendChild(lbl);
       endYs.push(ly);
     }
@@ -414,7 +429,7 @@ function renderChart() {
       if (!pt) continue;
       const row = document.createElement("div"); row.className = "tt-row";
       const key = document.createElement("span"); key.className = "tt-key"; key.style.borderTopColor = srcColor(s);
-      const val = document.createElement("span"); val.className = "tt-val"; val.textContent = fmtEur(pt.v);
+      const val = document.createElement("span"); val.className = "tt-val"; val.textContent = fmtMoney(pt.v);
       const name = document.createElement("span"); name.className = "tt-name"; name.textContent = SOURCE_META[s].name;
       row.append(key, val, name);
       tt.appendChild(row);
@@ -483,9 +498,9 @@ function renderMatrix() {
         const color = dark ? RAMP[RAMP.length - 1 - idx] : RAMP[idx];
         td.style.background = color;
         td.style.color = lum(color) > 0.45 ? "#0b0b0b" : "#ffffff";
-        td.textContent = fmtEur(q.price);
+        td.textContent = fmtCompact(q.price);
         if (q.price === lo) td.classList.add("cheapest");
-        td.title = dayLabel(o) + " → " + dayLabel(r) + " · " + fmtEur(q.price) + " · " + (q.airlines || []).join(", ") + " · " + q.source_name;
+        td.title = dayLabel(o) + " → " + dayLabel(r) + " · " + fmtMoney(q.price) + " · " + (q.airlines || []).join(", ") + " · " + q.source_name;
       }
       tr.appendChild(td);
     }
@@ -517,7 +532,11 @@ function renderDeals() {
   table.appendChild(hr);
   for (const q of rows) {
     const tr = document.createElement("tr");
-    const tdP = document.createElement("td"); tdP.className = "price"; tdP.textContent = fmtEur(q.price);
+    const tdP = document.createElement("td"); tdP.className = "price"; tdP.textContent = fmtMoney(q.price);
+    if (q.fare_type === "student") {
+      const b = document.createElement("span"); b.className = "badge"; b.textContent = "Student";
+      tdP.appendChild(b);
+    }
     const tdD = document.createElement("td"); tdD.textContent = dayLabel(q.out_date) + " → " + dayLabel(q.ret_date);
     const tdA = document.createElement("td"); tdA.textContent = (q.airlines || []).join(", ") || "—";
     const tdS = document.createElement("td");
@@ -549,7 +568,9 @@ function render() {
   renderMatrix();
   renderDeals();
   $("foot").textContent = "Sources: " + activeSources().map(s => SOURCE_META[s].name).join(", ") +
-    ". Prices are the total for 1 adult round trip in EUR and can change by the time you book. Data refreshes hourly via GitHub Actions.";
+    ". Prices are the total for 1 adult round trip in " + (LATEST.currency || "INR") +
+    " and can change by the time you book. EaseMyTrip round trips are the sum of its two one-way fares (its own booking flow prices them that way). " +
+    "Student fares need a valid student ID at booking and apply only on airlines that offer them. Data refreshes hourly via GitHub Actions.";
 }
 
 $("rangeSeg").addEventListener("click", (e) => {

@@ -2,8 +2,9 @@
 
 Tracks round-trip prices between **Amsterdam (AMS)** and **New Delhi (DEL)** —
 outbound **Aug 8–14, 2026**, return **Aug 24–31, 2026** — every hour, from
-multiple sources, and publishes a live dashboard with the full price history
-and booking links.
+multiple sources including Indian booking sites and **student fares**, all in
+**₹ INR**, and publishes a live dashboard with the full price history and
+booking links.
 
 **Live dashboard:** https://xthpb.github.io/flight-price-tracker/
 
@@ -12,8 +13,9 @@ and booking links.
 ```
 GitHub Actions (hourly cron)
   └─ tracker/main.py
-       ├─ sources/google_flights.py   Google Flights (via fast-flights protobuf filter + parser)
+       ├─ sources/google_flights.py   Google Flights, Indian market (fast-flights filter + parser)
        ├─ sources/kiwi.py             Kiwi.com public GraphQL search API
+       ├─ sources/easemytrip.py       EaseMyTrip (Indian OTA) — regular AND student fares
        ├─ sources/amadeus.py          Amadeus flight offers        (optional, needs API key)
        └─ sources/travelpayouts.py    Aviasales cached prices      (optional, needs API token)
              │
@@ -53,6 +55,15 @@ open docs/index.html   # or: python3 -m http.server -d docs
 
 ## Notes
 
-- Prices are totals for 1 adult, economy, in EUR, and can change by booking time.
-- Google Flights and Kiwi are scraped/unofficial endpoints; a source failing is
-  logged and skipped, never fatal — the run fails only if *no* source returns data.
+- Prices are totals for 1 adult, economy, in ₹ INR, and can change by booking time.
+- EaseMyTrip prices international round trips as two one-way fares (that is how its
+  own booking flow charges), so its quotes are the sum of the two directions.
+- Student fares (EaseMyTrip · Student) require a valid student ID at booking and
+  only some airlines offer them — often the price matches the regular fare.
+- Other Indian OTAs (MakeMyTrip, Goibibo, Cleartrip, ixigo, Yatra, Wego) sit behind
+  Akamai/Cloudflare bot protection and cannot be polled reliably by an unattended
+  hourly job; EaseMyTrip is the major Indian OTA with an automatable API.
+- All scraped endpoints are unofficial; a source failing is logged and skipped,
+  never fatal — the run fails only if *no* source returns data.
+- `docs/data/history-eur-archive.json` preserves the first day of tracking, which
+  ran in EUR before the switch to INR.

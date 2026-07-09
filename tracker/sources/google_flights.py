@@ -48,8 +48,8 @@ def _build_query(origin, destination, out_date, ret_date, adults, cabin, currenc
     )
 
 
-def _fetch_pair(query) -> list:
-    url = query.url()
+def _fetch_pair(query, market) -> list:
+    url = query.url() + f"&gl={market}"
     last_err = None
     for attempt in range(RETRIES):
         try:
@@ -69,6 +69,7 @@ def fetch(config) -> list[Quote]:
     cabin = config["cabin"]
     delay = config["google"]["request_delay_seconds"]
     per_pair = config["google"]["max_results_per_pair"]
+    market = config["google"].get("market", "US")
 
     quotes = []
     pairs = [(o, r) for o in config["dates"]["outbound"] for r in config["dates"]["return"]]
@@ -76,7 +77,7 @@ def fetch(config) -> list[Quote]:
         query = _build_query(route["origin"], route["destination"], out_date, ret_date,
                              adults, cabin, currency)
         try:
-            results = _fetch_pair(query)
+            results = _fetch_pair(query, market)
         except Exception as e:
             log.warning("google: %s -> %s failed: %s", out_date, ret_date, e)
             continue
@@ -97,7 +98,7 @@ def fetch(config) -> list[Quote]:
                 stops_out=max(len(legs) - 1, 0) if legs else None,
                 stops_in=None,  # Google's result rows only detail the outbound legs
                 duration_min=sum(leg.duration or 0 for leg in legs) or None,
-                booking_url=query.url(),
+                booking_url=query.url() + f"&gl={market}",
             ))
         if i < len(pairs) - 1:
             time.sleep(delay)

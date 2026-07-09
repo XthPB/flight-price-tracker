@@ -6,11 +6,11 @@ credentials are present in the environment.
 
 import os
 
-from . import google_flights, kiwi, amadeus, travelpayouts
+from . import google_flights, kiwi, easemytrip, amadeus, travelpayouts
 
 
 def active_sources() -> list:
-    sources = [google_flights, kiwi]
+    sources = [google_flights, kiwi, easemytrip]
     if os.environ.get("AMADEUS_CLIENT_ID") and os.environ.get("AMADEUS_CLIENT_SECRET"):
         sources.append(amadeus)
     if os.environ.get("TRAVELPAYOUTS_TOKEN"):

@@ -11,13 +11,18 @@
   },
   "passengers": { "adults": 1 },
   "cabin": "economy",
-  "currency": "EUR",
+  "currency": "INR",
   "google": {
     "request_delay_seconds": 1.5,
-    "max_results_per_pair": 4
+    "max_results_per_pair": 4,
+    "market": "IN"
   },
   "kiwi": {
-    "limit": 100
+    "limit": 100,
+    "market": "in"
+  },
+  "easemytrip": {
+    "request_delay_seconds": 1.0
   },
   "amadeus": {
     "max_pairs": 6

@@ -18,6 +18,7 @@ class Quote:
     stops_in: int | None = None
     duration_min: int | None = None  # total travel time when the source reports it
     booking_url: str = ""
+    fare_type: str = "regular"       # "regular" | "student"
 
     def to_dict(self) -> dict:
         return asdict(self)
