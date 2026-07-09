@@ -11,6 +11,7 @@ import time
 
 import requests
 from fast_flights import FlightQuery, Passengers, create_query
+from fast_flights.exceptions import FlightsNotFound
 from fast_flights.parser import parse
 
 from ..quotes import Quote
@@ -32,7 +33,12 @@ HEADERS = {
     ),
     "Accept-Language": "en-US,en;q=0.9",
 }
-RETRIES = 3
+# From datacenter IPs (e.g. GitHub Actions) Google often throttles: it returns a
+# page with no results and fast-flights raises FlightsNotFound("received error").
+# That is IP-level throttling, not a transient blip — retrying in a few seconds
+# does not help and just burns the workflow's time budget, so we fail that pair
+# fast and only retry genuine network/HTTP errors.
+RETRIES = 2
 
 
 def _build_query(origin, destination, out_date, ret_date, adults, cabin, currency):
@@ -53,12 +59,15 @@ def _fetch_pair(query, market) -> list:
     last_err = None
     for attempt in range(RETRIES):
         try:
-            r = requests.get(url, cookies=CONSENT_COOKIES, headers=HEADERS, timeout=45)
+            r = requests.get(url, cookies=CONSENT_COOKIES, headers=HEADERS, timeout=30)
             r.raise_for_status()
             return list(parse(r.text))
-        except Exception as e:  # parse errors, HTTP errors, timeouts
+        except FlightsNotFound:
+            # throttled or genuinely no flights — retrying won't change it
+            raise
+        except Exception as e:  # HTTP errors, timeouts, transient network issues
             last_err = e
-            time.sleep(3 * (attempt + 1))
+            time.sleep(2)
     raise last_err
 
 
