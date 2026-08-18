@@ -9,9 +9,17 @@ booking links. Trips whose dates have passed are kept as browsable archives.
 
 ## Adding or changing a trip
 
-Edit `config.json` (directly on GitHub is fine) and commit — **the push
-triggers a run immediately**, so prices appear on the dashboard within a few
-minutes, then refresh hourly. Add one object per trip to the `trips` list:
+**From the dashboard:** the **+ Track a trip** button opens a form — pick the
+airports (autocomplete over ~180 majors, or any IATA code), a single date or a
+range for each leg, currency/cabin/passengers — and it commits the trip to
+`config.json` for you. That needs a fine-grained GitHub token (Contents:
+read & write on this repo) which is asked for once and kept in the browser;
+without one, "Copy config snippet" gives you the JSON to paste in yourself.
+
+**By hand:** edit `config.json` (directly on GitHub is fine) and commit.
+Either way **the push triggers a run immediately**, so prices appear on the
+dashboard within a few minutes, then refresh hourly. One object per trip in
+the `trips` list:
 
 ```json
 {

@@ -7,166 +7,268 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
 <style>
 :root {
-  --surface-1: #fcfcfb;
   --page: #f9f9f7;
-  --text-primary: #0b0b0b;
-  --text-secondary: #52514e;
-  --text-muted: #898781;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --ink-3: #898781;
   --grid: #e1e0d9;
   --axis: #c3c2b7;
   --border: rgba(11,11,11,0.10);
+  --accent: #256abf;
+  --accent-ink: #ffffff;
   --good: #006300;
   --bad: #d03b3b;
   --s-google: #2a78d6;
-  --s-kiwi: #1baf7a;
-  --s-easemytrip: #eda100;
-  --s-easemytrip-student: #4a3aa7;
-  --s-amadeus: #e34948;
-  --s-travelpayouts: #e87ba4;
+  --s-kiwi: #eb6834;
+  --s-easemytrip: #1baf7a;
+  --s-easemytrip-student: #eda100;
+  --s-amadeus: #e87ba4;
+  --s-travelpayouts: #008300;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 :root[data-theme="dark"] {
-  --surface-1: #1a1a19;
   --page: #0d0d0d;
-  --text-primary: #ffffff;
-  --text-secondary: #c3c2b7;
-  --text-muted: #898781;
+  --surface: #1a1a19;
+  --ink: #ffffff;
+  --ink-2: #c3c2b7;
+  --ink-3: #898781;
   --grid: #2c2c2a;
   --axis: #383835;
   --border: rgba(255,255,255,0.10);
+  --accent: #3987e5;
+  --accent-ink: #0b0b0b;
   --good: #0ca30c;
   --bad: #e66767;
   --s-google: #3987e5;
-  --s-kiwi: #199e70;
-  --s-easemytrip: #c98500;
-  --s-easemytrip-student: #9085e9;
-  --s-amadeus: #e66767;
-  --s-travelpayouts: #d55181;
+  --s-kiwi: #d95926;
+  --s-easemytrip: #199e70;
+  --s-easemytrip-student: #c98500;
+  --s-amadeus: #d55181;
+  --s-travelpayouts: #008300;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { color-scheme: light; }
-:root[data-theme="dark"] html, :root[data-theme="dark"] { color-scheme: dark; }
-body {
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: var(--page);
-  color: var(--text-primary);
-  line-height: 1.45;
-}
-.wrap { max-width: 1060px; margin: 0 auto; padding: 24px 20px 56px; }
-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 6px; }
-h1 { font-size: 22px; font-weight: 650; letter-spacing: -0.01em; }
-.sub { color: var(--text-secondary); font-size: 13.5px; margin-top: 3px; }
-.sub .dot { color: var(--text-muted); margin: 0 6px; }
-#themeBtn {
-  background: var(--surface-1); border: 1px solid var(--border); color: var(--text-secondary);
-  border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer;
-}
-.updated { font-size: 12.5px; color: var(--text-muted); margin-bottom: 18px; }
+:root { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+html { scrollbar-gutter: stable; }
+body { font-family: var(--sans); background: var(--page); color: var(--ink); line-height: 1.45; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.wrap { max-width: 1060px; margin: 0 auto; padding: 20px 20px 56px; }
 
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 22px; }
-.tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
-.tile .label { font-size: 12.5px; color: var(--text-secondary); }
-.tile .value { font-size: 30px; font-weight: 600; margin-top: 2px; }
-.tile.hero .value { font-size: 44px; letter-spacing: -0.02em; }
-.tile .meta { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
-.tile .delta { font-size: 13px; font-weight: 600; margin-top: 4px; }
+/* ---------- top bar ---------- */
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 26px; }
+.wordmark { font: 600 12px/1 var(--mono); letter-spacing: 0.22em; color: var(--ink-3); text-transform: uppercase; }
+.wordmark b { color: var(--ink); font-weight: 600; }
+.top-actions { display: flex; gap: 8px; }
+.btn {
+  font: 600 13px/1 var(--sans); border-radius: 9px; padding: 9px 14px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--ink);
+}
+.btn:hover { background: var(--grid); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.quiet { color: var(--ink-2); }
+
+/* ---------- route board ---------- */
+.board { margin-bottom: 4px; }
+.board-route {
+  font-family: var(--mono); font-weight: 700; letter-spacing: 0.02em;
+  font-size: clamp(40px, 7.5vw, 62px); line-height: 1.05; display: flex; align-items: baseline; gap: 0.18em;
+}
+.board-route .swap { color: var(--ink-3); font-size: 0.55em; transform: translateY(-0.28em); font-weight: 400; }
+.board-cities { font-size: 14px; color: var(--ink-2); margin-top: 2px; }
+.board-cities .archived {
+  display: inline-block; font: 700 10.5px/1.6 var(--mono); letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--bad); border: 1px solid var(--bad); border-radius: 5px; padding: 1px 7px; margin-left: 10px; vertical-align: 1px;
+}
+.board-sub { font-size: 13px; color: var(--ink-2); margin-top: 8px; }
+.board-sub .dot { color: var(--ink-3); margin: 0 7px; }
+.board-sub .mono { font-family: var(--mono); font-size: 12.5px; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 4px; }
+.tab {
+  font: 600 12px/1 var(--mono); letter-spacing: 0.04em; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--ink-2);
+  border-radius: 8px; padding: 8px 12px; display: inline-flex; align-items: center; gap: 8px;
+}
+.tab:hover { background: var(--grid); }
+.tab[aria-selected="true"] { border-color: var(--ink); color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.tab .ended { font-size: 10px; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; }
+.tab[aria-selected="true"] .ended { color: var(--ink-3); }
+
+.updated { font-size: 12.5px; color: var(--ink-3); margin: 10px 0 18px; }
+
+/* ---------- fare strip ---------- */
+.fare { display: grid; grid-template-columns: minmax(280px, 360px) 1fr; gap: 12px; margin-bottom: 22px; align-items: stretch; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-content: stretch; }
+@media (max-width: 720px) { .fare { grid-template-columns: 1fr; } }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.tile .label { font-size: 12.5px; color: var(--ink-2); display: flex; align-items: center; gap: 7px; }
+.tile .value { font: 600 26px/1.25 var(--mono); margin-top: 4px; letter-spacing: -0.01em; }
+.tile .meta { font: 400 11.5px/1.5 var(--mono); color: var(--ink-3); margin-top: 3px; }
+.tile.stale .value { color: var(--ink-3); font-weight: 500; }
+.tile.hero { border-color: var(--axis); }
+.tile.hero .value { font-size: clamp(30px, 5.5vw, 44px); }
+.tile.hero .value.long { font-size: clamp(26px, 4.5vw, 34px); }
+.tile.hero .meta { font-size: 12.5px; color: var(--ink-2); }
+.tile .delta { font-size: 13px; font-weight: 600; margin-top: 6px; font-family: var(--sans); }
 .delta.down { color: var(--good); }
 .delta.up { color: var(--bad); }
-.delta.flat { color: var(--text-muted); font-weight: 500; }
+.delta.flat { color: var(--ink-3); font-weight: 500; }
+@media (max-width: 480px) { .tile.hero .value { font-size: clamp(26px, 8vw, 34px); } }
+a.book {
+  display: inline-block; font-size: 12.5px; font-weight: 600; text-decoration: none; margin-top: 8px;
+  color: var(--ink); border: 1px solid var(--border); background: var(--page);
+  border-radius: 7px; padding: 4px 10px; white-space: nowrap;
+}
+a.book:hover { background: var(--grid); }
+.srcdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex: none; }
+@media (max-width: 480px) { .tile.hero { grid-column: 1 / -1; } }
 
+/* ---------- filters ---------- */
 .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 14px; }
-.filters .flabel { font-size: 12.5px; color: var(--text-muted); margin-right: 2px; }
-.seg { display: inline-flex; background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-.seg button {
-  background: none; border: 0; padding: 6px 12px; font: inherit; font-size: 13px;
-  color: var(--text-secondary); cursor: pointer;
-}
-.seg button[aria-pressed="true"] { background: var(--grid); color: var(--text-primary); font-weight: 600; }
-select#pairSel, select#routeSel {
-  background: var(--surface-1); border: 1px solid var(--border); color: var(--text-primary);
-  border-radius: 8px; padding: 6px 8px; font: inherit; font-size: 13px;
-}
-.hright { display: flex; gap: 8px; align-items: center; flex: none; }
-.archived {
-  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
-  text-transform: uppercase; color: var(--bad); border: 1px solid var(--bad);
-  border-radius: 5px; padding: 1px 7px; margin-left: 8px; vertical-align: 2px;
+.filters .flabel { font-size: 12.5px; color: var(--ink-3); margin-right: 2px; }
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.seg button { background: none; border: 0; padding: 6px 12px; font: inherit; font-size: 13px; color: var(--ink-2); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--grid); color: var(--ink); font-weight: 600; }
+select, input[type="date"], input[type="text"], input[type="number"], input[type="password"] {
+  background: var(--surface); border: 1px solid var(--border); color: var(--ink);
+  border-radius: 8px; padding: 7px 9px; font: inherit; font-size: 13px;
 }
 
-.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 22px; }
+/* ---------- cards ---------- */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 22px; }
 .card h2 { font-size: 15px; font-weight: 650; }
-.card .desc { font-size: 12.5px; color: var(--text-muted); margin: 2px 0 12px; }
+.card .desc { font-size: 12.5px; color: var(--ink-3); margin: 2px 0 12px; }
 .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 8px; }
-.legend .key { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); }
+.legend .key { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-2); }
 .legend .swatch { width: 16px; height: 0; border-top: 2.5px solid; border-radius: 2px; }
 
 #chartBox { position: relative; }
 #chart { display: block; width: 100%; height: auto; }
 #tooltip {
   position: absolute; pointer-events: none; display: none; z-index: 5;
-  background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
-  padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 14px rgba(0,0,0,0.14);
-  min-width: 150px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 14px rgba(0,0,0,0.14); min-width: 150px;
 }
-#tooltip .tt-time { color: var(--text-muted); font-size: 11.5px; margin-bottom: 4px; }
+#tooltip .tt-time { color: var(--ink-3); font-size: 11.5px; margin-bottom: 4px; }
 #tooltip .tt-row { display: flex; align-items: center; gap: 7px; margin-top: 2px; }
 #tooltip .tt-key { width: 12px; height: 0; border-top: 2.5px solid; border-radius: 2px; flex: none; }
-#tooltip .tt-val { font-weight: 650; }
-#tooltip .tt-name { color: var(--text-secondary); }
+#tooltip .tt-val { font-weight: 650; font-family: var(--mono); font-size: 12px; }
+#tooltip .tt-name { color: var(--ink-2); }
 
 .matrix-scroll { overflow-x: auto; }
-table.matrix { border-collapse: separate; border-spacing: 2px; font-size: 12.5px; }
-table.matrix th { font-weight: 500; color: var(--text-muted); padding: 4px 6px; text-align: center; font-variant-numeric: tabular-nums; }
+table.matrix { border-collapse: separate; border-spacing: 2px; font-size: 12px; font-family: var(--mono); }
+table.matrix th { font-weight: 500; color: var(--ink-3); padding: 4px 6px; text-align: center; font-size: 11px; }
 table.matrix th.rowh { text-align: right; }
-table.matrix td {
-  min-width: 62px; height: 40px; text-align: center; border-radius: 6px;
-  font-variant-numeric: tabular-nums; cursor: default; position: relative;
-}
-table.matrix td.cheapest { outline: 2px solid var(--text-primary); outline-offset: -2px; font-weight: 700; }
-table.matrix td.empty { background: var(--page); color: var(--text-muted); }
+table.matrix td { min-width: 62px; height: 40px; text-align: center; border-radius: 6px; cursor: default; }
+table.matrix td.cheapest { outline: 2px solid var(--ink); outline-offset: -2px; font-weight: 700; }
+table.matrix td.empty { background: var(--page); color: var(--ink-3); }
 table.matrix td:hover:not(.empty) { filter: brightness(1.08); }
-.axis-note { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+.axis-note { font-size: 12px; color: var(--ink-3); margin-top: 8px; }
 
 table.deals { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-table.deals th { text-align: left; font-size: 12px; color: var(--text-muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--grid); }
+table.deals th { text-align: left; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--grid); }
 table.deals td { padding: 9px 10px; border-bottom: 1px solid var(--grid); vertical-align: top; }
 table.deals tr:last-child td { border-bottom: 0; }
-table.deals td.price { font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.srcmark { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
+table.deals td.price, table.deals td.dates { font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+table.deals td.price { font-weight: 700; }
 .badge {
-  display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em;
-  color: var(--text-secondary); border: 1px solid var(--border); border-radius: 5px;
-  padding: 1px 6px; margin-left: 7px; vertical-align: 1px; text-transform: uppercase;
+  display: inline-block; font: 700 10px/1.6 var(--mono); letter-spacing: 0.05em; color: var(--ink-2);
+  border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; margin-left: 7px; vertical-align: 1px; text-transform: uppercase;
 }
-a.book {
-  display: inline-block; font-size: 12.5px; font-weight: 600; text-decoration: none;
-  color: var(--text-primary); border: 1px solid var(--border); background: var(--page);
-  border-radius: 7px; padding: 4px 10px; white-space: nowrap;
+.muted { color: var(--ink-3); }
+footer { font-size: 12px; color: var(--ink-3); margin-top: 8px; }
+#loading { padding: 60px 0; text-align: center; color: var(--ink-3); }
+#loading .pulse { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-right: 8px; }
+@media (prefers-reduced-motion: no-preference) {
+  #loading .pulse { animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: 0.25; } }
 }
-a.book:hover { background: var(--grid); }
-.muted { color: var(--text-muted); }
-footer { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
-footer a { color: var(--text-secondary); }
-#loading { padding: 60px 0; text-align: center; color: var(--text-muted); }
+
+/* ---------- new-trip ticket ---------- */
+dialog#tripDlg {
+  border: 1px solid var(--border); border-radius: 14px; background: var(--surface); color: var(--ink);
+  width: min(560px, calc(100vw - 32px)); padding: 0; box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+}
+dialog#tripDlg::backdrop { background: rgba(0,0,0,0.45); }
+.ticket-head { padding: 18px 22px 4px; display: flex; justify-content: space-between; align-items: center; }
+.ticket-head h2 { font: 600 13px/1 var(--mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-2); }
+.ticket-head .x { background: none; border: 0; color: var(--ink-3); font-size: 18px; cursor: pointer; padding: 4px 8px; }
+.ticket-body { padding: 10px 22px 18px; }
+.frow { display: flex; gap: 10px; align-items: flex-end; }
+.field { flex: 1; min-width: 0; }
+.field label { display: block; font: 600 10.5px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin: 14px 0 5px; }
+.field input, .field select { width: 100%; }
+.ac { position: relative; }
+.ac input { font-family: var(--mono); font-size: 15px; text-transform: uppercase; }
+.ac input::placeholder { text-transform: none; font-family: var(--sans); font-size: 13px; }
+.ac-list {
+  position: absolute; z-index: 10; left: 0; right: 0; top: calc(100% + 4px); max-height: 210px; overflow-y: auto;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+.ac-list button { display: flex; gap: 10px; width: 100%; text-align: left; background: none; border: 0; padding: 8px 12px; font-size: 13px; color: var(--ink); cursor: pointer; align-items: baseline; }
+.ac-list button:hover, .ac-list button.hl { background: var(--grid); }
+.ac-list .code { font: 700 13px var(--mono); flex: none; width: 42px; }
+.ac-list .place { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-list .place small { color: var(--ink-3); }
+.swapbtn { flex: none; align-self: flex-end; margin-bottom: 1px; font-family: var(--mono); }
+.opt3 { display: flex; gap: 10px; }
+.opt3 .field { flex: 1; }
+.hint { font-size: 12px; color: var(--ink-3); margin-top: 6px; }
+.hint a { color: var(--ink-2); }
+.ticket-stub { position: relative; border-top: 2px dashed var(--grid); margin-top: 18px; padding: 14px 22px 18px; }
+.ticket-stub::before, .ticket-stub::after {
+  content: ""; position: absolute; top: -9px; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--page); border: 1px solid var(--border);
+}
+.ticket-stub::before { left: -9px; }
+.ticket-stub::after { right: -9px; }
+.stub-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+#formStatus { font-size: 12.5px; margin-top: 10px; }
+#formStatus.err { color: var(--bad); }
+#formStatus.ok { color: var(--good); }
+.tokenrow { display: none; }
+.tokenrow.show { display: block; }
+.tokensaved { font-size: 12px; color: var(--ink-3); margin-top: 12px; }
+.tokensaved button { background: none; border: 0; color: var(--ink-2); cursor: pointer; text-decoration: underline; font-size: 12px; padding: 0; }
+
+#toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 50; display: none;
+  background: var(--ink); color: var(--page); font-size: 13.5px; padding: 11px 18px; border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3); max-width: min(480px, calc(100vw - 32px)); text-align: center;
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div>
-      <h1 id="routeTitle">Flight price tracker</h1>
-      <div class="sub" id="routeSub"></div>
-    </div>
-    <div class="hright">
-      <select id="routeSel" aria-label="Tracked trip" style="display:none"></select>
-      <button id="themeBtn" aria-label="Toggle theme">◐ Theme</button>
+  <header class="top">
+    <div class="wordmark">✈ <b>FARE&nbsp;WATCH</b> · FLIGHT&nbsp;PRICE&nbsp;TRACKER</div>
+    <div class="top-actions">
+      <button class="btn primary" id="newTripBtn">+ Track a trip</button>
+      <button class="btn quiet" id="themeBtn" aria-label="Toggle theme">◐</button>
     </div>
   </header>
-  <div class="updated" id="updated">Loading…</div>
 
-  <div id="loading">Fetching latest prices…</div>
+  <section class="board">
+    <div class="board-route" aria-live="polite">
+      <span id="codeFrom">···</span><span class="swap">⇄</span><span id="codeTo">···</span>
+    </div>
+    <div class="board-cities" id="boardCities"></div>
+    <div class="board-sub" id="routeSub"></div>
+    <div class="tabs" id="routeTabs" role="tablist"></div>
+  </section>
+
+  <div class="updated" id="updated"></div>
+
+  <div id="loading"><span class="pulse"></span>Fetching latest prices…</div>
   <div id="app" style="display:none">
 
-    <div class="tiles" id="tiles"></div>
+    <div class="fare">
+      <div class="tile hero" id="heroTile"></div>
+      <div class="tiles" id="tiles"></div>
+    </div>
 
     <div class="filters">
       <span class="flabel">History</span>
@@ -207,8 +309,89 @@ footer a { color: var(--text-secondary); }
   </div>
 </div>
 
+<dialog id="tripDlg" aria-label="Track a new trip">
+  <div class="ticket-head">
+    <h2>New trip · round trip</h2>
+    <button class="x" id="dlgClose" aria-label="Close">✕</button>
+  </div>
+  <form class="ticket-body" id="tripForm" novalidate>
+    <div class="frow">
+      <div class="field ac" id="acFrom">
+        <label for="fromInp">From</label>
+        <input id="fromInp" type="text" placeholder="City or airport code" autocomplete="off" spellcheck="false" required>
+        <div class="ac-list" hidden></div>
+      </div>
+      <button type="button" class="btn swapbtn" id="swapBtn" title="Swap airports">⇄</button>
+      <div class="field ac" id="acTo">
+        <label for="toInp">To</label>
+        <input id="toInp" type="text" placeholder="City or airport code" autocomplete="off" spellcheck="false" required>
+        <div class="ac-list" hidden></div>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="field">
+        <label for="outStart">Depart</label>
+        <input id="outStart" type="date" required>
+      </div>
+      <div class="field">
+        <label for="outEnd">Depart until <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input id="outEnd" type="date">
+      </div>
+    </div>
+    <div class="frow">
+      <div class="field">
+        <label for="retStart">Return</label>
+        <input id="retStart" type="date" required>
+      </div>
+      <div class="field">
+        <label for="retEnd">Return until <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input id="retEnd" type="date">
+      </div>
+    </div>
+    <div class="hint">Leave the “until” fields empty to watch a single date; fill them to watch every date in the range.</div>
+    <div class="opt3">
+      <div class="field">
+        <label for="curSel">Currency</label>
+        <select id="curSel"><option>EUR</option><option>INR</option><option>USD</option><option>GBP</option></select>
+      </div>
+      <div class="field">
+        <label for="cabinSel">Cabin</label>
+        <select id="cabinSel">
+          <option value="economy">Economy</option>
+          <option value="premium-economy">Premium economy</option>
+          <option value="business">Business</option>
+          <option value="first">First</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="adultsInp">Adults</label>
+        <input id="adultsInp" type="number" min="1" max="9" value="1">
+      </div>
+    </div>
+    <div class="field tokenrow" id="tokenRow">
+      <label for="tokenInp">GitHub token</label>
+      <input id="tokenInp" type="password" placeholder="github_pat_… (stays in this browser)" autocomplete="off">
+      <div class="hint">Saving to the tracker commits to <span style="font-family:var(--mono)">config.json</span> in the repo, so it needs a
+        <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">fine-grained token</a>
+        for the flight-price-tracker repository with <b>Contents: read &amp; write</b>. It is stored only in this browser.</div>
+    </div>
+    <div class="tokensaved" id="tokenSaved" style="display:none">Token saved in this browser · <button type="button" id="forgetTok">forget it</button></div>
+  </form>
+  <div class="ticket-stub">
+    <div class="stub-actions">
+      <button class="btn primary" id="startBtn" form="tripForm">Start tracking</button>
+      <button class="btn" id="copyBtn" type="button">Copy config snippet</button>
+    </div>
+    <div id="formStatus"></div>
+  </div>
+</dialog>
+
+<div id="toast" role="status"></div>
+
 <script>
 "use strict";
+
+const REPO = "XthPB/flight-price-tracker";
 
 const SOURCE_META = {
   google:                { name: "Google Flights",       cssVar: "--s-google" },
@@ -221,6 +404,64 @@ const SOURCE_META = {
 // sequential blue ramp (palette steps 100..700) for the price matrix
 const RAMP = ["#cde2fb","#b7d3f6","#9ec5f4","#86b6ef","#6da7ec","#5598e7","#3987e5","#2a78d6","#256abf","#1c5cab","#184f95","#104281","#0d366b"];
 
+// [IATA, city, country, country code] — country feeds EaseMyTrip links, code feeds Google/Kiwi market
+const AIRPORTS = [
+["AMS","Amsterdam","Netherlands","NL"],["EIN","Eindhoven","Netherlands","NL"],["RTM","Rotterdam","Netherlands","NL"],
+["DEL","New Delhi","India","IN"],["BOM","Mumbai","India","IN"],["BLR","Bengaluru","India","IN"],["MAA","Chennai","India","IN"],
+["HYD","Hyderabad","India","IN"],["CCU","Kolkata","India","IN"],["AMD","Ahmedabad","India","IN"],["COK","Kochi","India","IN"],
+["GOI","Goa","India","IN"],["PNQ","Pune","India","IN"],["JAI","Jaipur","India","IN"],["LKO","Lucknow","India","IN"],
+["IXC","Chandigarh","India","IN"],["ATQ","Amritsar","India","IN"],["TRV","Thiruvananthapuram","India","IN"],
+["CDG","Paris","France","FR"],["ORY","Paris Orly","France","FR"],["NCE","Nice","France","FR"],["LYS","Lyon","France","FR"],
+["MRS","Marseille","France","FR"],["TLS","Toulouse","France","FR"],["BOD","Bordeaux","France","FR"],["NTE","Nantes","France","FR"],
+["LHR","London Heathrow","United Kingdom","GB"],["LGW","London Gatwick","United Kingdom","GB"],["STN","London Stansted","United Kingdom","GB"],
+["LTN","London Luton","United Kingdom","GB"],["LCY","London City","United Kingdom","GB"],["MAN","Manchester","United Kingdom","GB"],
+["EDI","Edinburgh","United Kingdom","GB"],["BHX","Birmingham","United Kingdom","GB"],["GLA","Glasgow","United Kingdom","GB"],
+["BRS","Bristol","United Kingdom","GB"],["DUB","Dublin","Ireland","IE"],["ORK","Cork","Ireland","IE"],
+["FRA","Frankfurt","Germany","DE"],["MUC","Munich","Germany","DE"],["BER","Berlin","Germany","DE"],["DUS","Düsseldorf","Germany","DE"],
+["HAM","Hamburg","Germany","DE"],["CGN","Cologne","Germany","DE"],["STR","Stuttgart","Germany","DE"],
+["ZRH","Zurich","Switzerland","CH"],["GVA","Geneva","Switzerland","CH"],["BSL","Basel","Switzerland","CH"],
+["VIE","Vienna","Austria","AT"],["BRU","Brussels","Belgium","BE"],["CRL","Brussels Charleroi","Belgium","BE"],["LUX","Luxembourg","Luxembourg","LU"],
+["MAD","Madrid","Spain","ES"],["BCN","Barcelona","Spain","ES"],["AGP","Málaga","Spain","ES"],["PMI","Palma de Mallorca","Spain","ES"],
+["VLC","Valencia","Spain","ES"],["SVQ","Seville","Spain","ES"],["ALC","Alicante","Spain","ES"],["IBZ","Ibiza","Spain","ES"],
+["LIS","Lisbon","Portugal","PT"],["OPO","Porto","Portugal","PT"],["FAO","Faro","Portugal","PT"],
+["FCO","Rome Fiumicino","Italy","IT"],["MXP","Milan Malpensa","Italy","IT"],["LIN","Milan Linate","Italy","IT"],["BGY","Milan Bergamo","Italy","IT"],
+["VCE","Venice","Italy","IT"],["NAP","Naples","Italy","IT"],["BLQ","Bologna","Italy","IT"],["FLR","Florence","Italy","IT"],["CTA","Catania","Italy","IT"],
+["ATH","Athens","Greece","GR"],["SKG","Thessaloniki","Greece","GR"],["HER","Heraklion","Greece","GR"],
+["IST","Istanbul","Türkiye","TR"],["SAW","Istanbul Sabiha","Türkiye","TR"],["AYT","Antalya","Türkiye","TR"],
+["CPH","Copenhagen","Denmark","DK"],["BLL","Billund","Denmark","DK"],["OSL","Oslo","Norway","NO"],
+["ARN","Stockholm","Sweden","SE"],["GOT","Gothenburg","Sweden","SE"],["HEL","Helsinki","Finland","FI"],["KEF","Reykjavík","Iceland","IS"],
+["WAW","Warsaw","Poland","PL"],["KRK","Kraków","Poland","PL"],["GDN","Gdańsk","Poland","PL"],["PRG","Prague","Czechia","CZ"],
+["BUD","Budapest","Hungary","HU"],["OTP","Bucharest","Romania","RO"],["SOF","Sofia","Bulgaria","BG"],["BEG","Belgrade","Serbia","RS"],
+["ZAG","Zagreb","Croatia","HR"],["SPU","Split","Croatia","HR"],["DBV","Dubrovnik","Croatia","HR"],["LJU","Ljubljana","Slovenia","SI"],
+["RIX","Riga","Latvia","LV"],["VNO","Vilnius","Lithuania","LT"],["TLL","Tallinn","Estonia","EE"],["MLA","Malta","Malta","MT"],["LCA","Larnaca","Cyprus","CY"],
+["DXB","Dubai","United Arab Emirates","AE"],["AUH","Abu Dhabi","United Arab Emirates","AE"],["SHJ","Sharjah","United Arab Emirates","AE"],
+["DOH","Doha","Qatar","QA"],["KWI","Kuwait City","Kuwait","KW"],["BAH","Bahrain","Bahrain","BH"],["MCT","Muscat","Oman","OM"],
+["RUH","Riyadh","Saudi Arabia","SA"],["JED","Jeddah","Saudi Arabia","SA"],["AMM","Amman","Jordan","JO"],["TLV","Tel Aviv","Israel","IL"],["CAI","Cairo","Egypt","EG"],
+["JFK","New York JFK","United States","US"],["EWR","Newark","United States","US"],["BOS","Boston","United States","US"],
+["ORD","Chicago","United States","US"],["LAX","Los Angeles","United States","US"],["SFO","San Francisco","United States","US"],
+["SEA","Seattle","United States","US"],["IAD","Washington Dulles","United States","US"],["ATL","Atlanta","United States","US"],
+["MIA","Miami","United States","US"],["DFW","Dallas–Fort Worth","United States","US"],["IAH","Houston","United States","US"],
+["DEN","Denver","United States","US"],["PHX","Phoenix","United States","US"],["LAS","Las Vegas","United States","US"],
+["MSP","Minneapolis","United States","US"],["DTW","Detroit","United States","US"],["PHL","Philadelphia","United States","US"],
+["SLC","Salt Lake City","United States","US"],["SAN","San Diego","United States","US"],["AUS","Austin","United States","US"],
+["YYZ","Toronto","Canada","CA"],["YVR","Vancouver","Canada","CA"],["YUL","Montreal","Canada","CA"],["YYC","Calgary","Canada","CA"],
+["MEX","Mexico City","Mexico","MX"],["CUN","Cancún","Mexico","MX"],["GRU","São Paulo","Brazil","BR"],["GIG","Rio de Janeiro","Brazil","BR"],
+["EZE","Buenos Aires","Argentina","AR"],["SCL","Santiago","Chile","CL"],["LIM","Lima","Peru","PE"],["BOG","Bogotá","Colombia","CO"],["PTY","Panama City","Panama","PA"],
+["SIN","Singapore","Singapore","SG"],["BKK","Bangkok","Thailand","TH"],["HKT","Phuket","Thailand","TH"],["CNX","Chiang Mai","Thailand","TH"],
+["KUL","Kuala Lumpur","Malaysia","MY"],["HKG","Hong Kong","Hong Kong","HK"],["PVG","Shanghai Pudong","China","CN"],["PEK","Beijing","China","CN"],
+["CAN","Guangzhou","China","CN"],["NRT","Tokyo Narita","Japan","JP"],["HND","Tokyo Haneda","Japan","JP"],["KIX","Osaka","Japan","JP"],
+["ICN","Seoul Incheon","South Korea","KR"],["TPE","Taipei","Taiwan","TW"],["MNL","Manila","Philippines","PH"],
+["CGK","Jakarta","Indonesia","ID"],["DPS","Bali Denpasar","Indonesia","ID"],["SGN","Ho Chi Minh City","Vietnam","VN"],["HAN","Hanoi","Vietnam","VN"],
+["PNH","Phnom Penh","Cambodia","KH"],["CMB","Colombo","Sri Lanka","LK"],["MLE","Malé","Maldives","MV"],["DAC","Dhaka","Bangladesh","BD"],
+["KTM","Kathmandu","Nepal","NP"],["ISB","Islamabad","Pakistan","PK"],["KHI","Karachi","Pakistan","PK"],["LHE","Lahore","Pakistan","PK"],
+["TAS","Tashkent","Uzbekistan","UZ"],["ALA","Almaty","Kazakhstan","KZ"],["GYD","Baku","Azerbaijan","AZ"],["TBS","Tbilisi","Georgia","GE"],["EVN","Yerevan","Armenia","AM"],
+["SYD","Sydney","Australia","AU"],["MEL","Melbourne","Australia","AU"],["BNE","Brisbane","Australia","AU"],["PER","Perth","Australia","AU"],["AKL","Auckland","New Zealand","NZ"],
+["JNB","Johannesburg","South Africa","ZA"],["CPT","Cape Town","South Africa","ZA"],["NBO","Nairobi","Kenya","KE"],["ADD","Addis Ababa","Ethiopia","ET"],
+["LOS","Lagos","Nigeria","NG"],["ACC","Accra","Ghana","GH"],["CMN","Casablanca","Morocco","MA"],["RAK","Marrakesh","Morocco","MA"],
+["TUN","Tunis","Tunisia","TN"],["ALG","Algiers","Algeria","DZ"],["DAR","Dar es Salaam","Tanzania","TZ"],["ZNZ","Zanzibar","Tanzania","TZ"],
+["MRU","Mauritius","Mauritius","MU"],["SEZ","Seychelles","Seychelles","SC"],
+];
+
 let INDEX = null, TRIP = null, LATEST = null, HISTORY = [], rangeDays = 0, pairFilter = "";
 
 const $ = (id) => document.getElementById(id);
@@ -228,7 +469,7 @@ const CURRENCIES = { INR: { sym: "₹", locale: "en-IN" }, EUR: { sym: "€", lo
 let CUR = CURRENCIES.EUR;
 const fmtMoney = (v) => CUR.sym + Math.round(v).toLocaleString(CUR.locale);
 const fmtCompact = (v) => v >= 10000 ? CUR.sym + (v / 1000).toFixed(v >= 100000 ? 0 : 1) + "k" : fmtMoney(v);
-const srcColor = (s) => getComputedStyle(document.documentElement).getPropertyValue((SOURCE_META[s] || {}).cssVar || "--text-muted").trim();
+const srcColor = (s) => getComputedStyle(document.documentElement).getPropertyValue((SOURCE_META[s] || {}).cssVar || "--ink-3").trim();
 const dayLabel = (iso) => { const d = new Date(iso + "T12:00:00Z"); return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }); };
 const routeLabel = (t) => (t.route.origin_city || t.route.origin) + " ⇄ " + (t.route.destination_city || t.route.destination);
 function fmtWindow(dates) {
@@ -249,7 +490,7 @@ function initTheme() {
     const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = next;
     localStorage.setItem("theme", next);
-    render();
+    if (LATEST) render();
   };
 }
 
@@ -260,7 +501,7 @@ async function load() {
   const r = await fetch("data/index.json" + bust());
   if (!r.ok) throw new Error("index.json " + r.status);
   INDEX = await r.json();
-  buildRouteSelect();
+  buildRouteTabs();
   await loadTrip(pickTripId());
 }
 
@@ -272,33 +513,43 @@ function pickTripId() {
   return (firstActive || INDEX.trips[0]).id;
 }
 
-function buildRouteSelect() {
-  const sel = $("routeSel");
-  sel.textContent = "";
+function buildRouteTabs() {
+  const box = $("routeTabs");
+  box.textContent = "";
   for (const t of INDEX.trips) {
-    const opt = document.createElement("option");
-    opt.value = t.id;
-    opt.textContent = routeLabel(t) + (t.active ? "" : " (ended)");
-    sel.appendChild(opt);
+    const b = document.createElement("button");
+    b.className = "tab"; b.role = "tab"; b.dataset.id = t.id;
+    b.setAttribute("aria-selected", "false");
+    b.appendChild(document.createTextNode(t.route.origin + "–" + t.route.destination + " " +
+      new Date(t.dates.outbound[0] + "T12:00:00Z").toLocaleDateString("en-GB", { month: "short", year: "2-digit", timeZone: "UTC" }).replace(" ", " ’")));
+    if (!t.active) { const e = document.createElement("span"); e.className = "ended"; e.textContent = "ended"; b.appendChild(e); }
+    b.onclick = () => {
+      localStorage.setItem("trip", t.id);
+      history.replaceState(null, "", "#" + t.id);
+      loadTrip(t.id).catch(err => { $("loading").textContent = "Failed to load data: " + err.message; });
+    };
+    box.appendChild(b);
   }
-  sel.style.display = INDEX.trips.length > 1 ? "" : "none";
-  sel.onchange = () => {
-    localStorage.setItem("trip", sel.value);
-    history.replaceState(null, "", "#" + sel.value);
-    loadTrip(sel.value).catch(err => { $("loading").textContent = "Failed to load data: " + err.message; });
-  };
+  box.style.display = INDEX.trips.length > 1 ? "" : "none";
 }
 
 async function loadTrip(id) {
   const silent = LATEST && TRIP && TRIP.id === id; // periodic refresh: update in place
   TRIP = INDEX.trips.find(t => t.id === id);
-  $("routeSel").value = id;
-  document.title = routeLabel(TRIP) + " · Flight Price Tracker";
-  $("routeTitle").textContent = routeLabel(TRIP) + " · flight price tracker";
+  for (const b of $("routeTabs").children) b.setAttribute("aria-selected", String(b.dataset.id === id));
+  document.title = TRIP.route.origin + " ⇄ " + TRIP.route.destination + " · Flight Price Tracker";
+  $("codeFrom").textContent = TRIP.route.origin;
+  $("codeTo").textContent = TRIP.route.destination;
+  const cities = $("boardCities");
+  cities.textContent = (TRIP.route.origin_city || "") + " — " + (TRIP.route.destination_city || "");
+  if (!TRIP.active) {
+    const b = document.createElement("span"); b.className = "archived"; b.textContent = "Tracking ended";
+    cities.appendChild(b);
+  }
   if (!silent) {
     $("app").style.display = "none";
     $("loading").style.display = "";
-    $("loading").textContent = "Fetching latest prices…";
+    $("loading").innerHTML = '<span class="pulse"></span>Fetching latest prices…';
   }
   const [rl, rh] = await Promise.all([
     fetch("data/" + id + "/latest.json" + bust()),
@@ -307,8 +558,8 @@ async function loadTrip(id) {
   if (!rl.ok || !rh.ok) {
     $("routeSub").textContent = "";
     $("updated").textContent = "";
-    $("loading").textContent = TRIP.active
-      ? "No data yet for this trip — the first check should land within the hour."
+    $("loading").innerHTML = TRIP.active
+      ? '<span class="pulse"></span>No prices yet — the first check usually lands within 10 minutes.'
       : "No data was recorded for this trip.";
     return;
   }
@@ -343,7 +594,6 @@ function buildPairSelect() {
 
 /* ---------- history series ---------- */
 function seriesData() {
-  // per source: [{t: Date, v: price}], best across pairs (or the selected pair)
   const cutoff = rangeDays ? Date.now() - rangeDays * 864e5 : 0;
   const [po, pr] = pairFilter ? pairFilter.split("|") : [null, null];
   const out = {};
@@ -360,47 +610,79 @@ function seriesData() {
   return out;
 }
 
-/* ---------- stat tiles ---------- */
+/* ---------- fare strip ---------- */
+function lastSeen(src) {
+  for (let i = HISTORY.length - 1; i >= 0; i--) {
+    const prices = HISTORY[i].q.filter(e => e[0] === src).map(e => e[3]);
+    if (prices.length) return { t: HISTORY[i].t, v: Math.min(...prices) };
+  }
+  return null;
+}
+
 function renderTiles() {
   const tiles = $("tiles");
+  const hero = $("heroTile");
   tiles.textContent = "";
+  hero.textContent = "";
   const quotes = LATEST.quotes || [];
   if (!quotes.length) return;
   const best = quotes[0]; // sorted by price
 
-  // delta vs ~24h ago (overall best across sources)
   const dayAgo = Date.now() - 864e5;
   let prev = null;
   for (const run of HISTORY) {
     if (+new Date(run.t) <= dayAgo) prev = run; else break;
   }
-  const prevBest = prev ? Math.min(...prev.q.map(e => e[3])) : null;
+  const prevBest = prev && prev.q.length ? Math.min(...prev.q.map(e => e[3])) : null;
 
-  const hero = document.createElement("div");
-  hero.className = "tile hero";
-  const heroDelta = prevBest == null ? "" :
-    (Math.abs(best.price - prevBest) < 1
-      ? '<div class="delta flat">unchanged vs 24h ago</div>'
-      : '<div class="delta ' + (best.price < prevBest ? "down" : "up") + '">' +
-        (best.price < prevBest ? "▼ " : "▲ ") + fmtMoney(Math.abs(best.price - prevBest)) + " vs 24h ago</div>");
-  hero.innerHTML = '<div class="label">Cheapest right now</div><div class="value"></div><div class="meta"></div>' + heroDelta;
-  hero.querySelector(".value").textContent = fmtMoney(best.price);
-  hero.querySelector(".meta").textContent =
-    dayLabel(best.out_date) + " → " + dayLabel(best.ret_date) + " · " + (best.airlines || []).join(", ") + " · " + best.source_name;
-  tiles.appendChild(hero);
+  const label = document.createElement("div"); label.className = "label";
+  label.textContent = TRIP.active ? "Cheapest right now" : "Cheapest at the last check";
+  const value = document.createElement("div"); value.className = "value";
+  value.textContent = fmtMoney(best.price);
+  if (value.textContent.length > 8) value.classList.add("long");
+  const meta = document.createElement("div"); meta.className = "meta";
+  meta.textContent = dayLabel(best.out_date) + " → " + dayLabel(best.ret_date) +
+    " · " + ((best.airlines || []).join(", ") || "—") + " · via " + best.source_name;
+  hero.append(label, value, meta);
+  if (prevBest != null) {
+    const d = document.createElement("div");
+    const diff = best.price - prevBest;
+    d.className = "delta " + (Math.abs(diff) < 1 ? "flat" : diff < 0 ? "down" : "up");
+    d.textContent = Math.abs(diff) < 1 ? "unchanged vs 24h ago"
+      : (diff < 0 ? "▼ " : "▲ ") + fmtMoney(Math.abs(diff)) + " vs 24h ago";
+    hero.appendChild(d);
+  }
+  if (TRIP.active && best.booking_url) {
+    const a = document.createElement("a");
+    a.className = "book"; a.href = best.booking_url; a.target = "_blank"; a.rel = "noopener noreferrer";
+    a.textContent = "Book this fare ↗";
+    hero.appendChild(a);
+  }
 
   for (const src of activeSources()) {
     const q = quotes.find(x => x.source === src);
     const tile = document.createElement("div");
     tile.className = "tile";
-    const label = document.createElement("div"); label.className = "label";
-    const mark = document.createElement("span"); mark.className = "srcmark"; mark.style.background = srcColor(src);
-    label.appendChild(mark); label.appendChild(document.createTextNode(SOURCE_META[src].name));
-    const value = document.createElement("div"); value.className = "value";
-    value.textContent = q ? fmtMoney(q.price) : "—";
-    const meta = document.createElement("div"); meta.className = "meta";
-    meta.textContent = q ? dayLabel(q.out_date) + " → " + dayLabel(q.ret_date) : "no data this run";
-    tile.append(label, value, meta);
+    const lb = document.createElement("div"); lb.className = "label";
+    const mark = document.createElement("span"); mark.className = "srcdot"; mark.style.background = srcColor(src);
+    lb.appendChild(mark); lb.appendChild(document.createTextNode(SOURCE_META[src].name));
+    const val = document.createElement("div"); val.className = "value";
+    const mt = document.createElement("div"); mt.className = "meta";
+    if (q) {
+      val.textContent = fmtMoney(q.price);
+      mt.textContent = dayLabel(q.out_date) + " → " + dayLabel(q.ret_date);
+    } else {
+      const seen = lastSeen(src);
+      tile.classList.add("stale");
+      if (seen) {
+        val.textContent = fmtMoney(seen.v);
+        mt.textContent = "last seen " + new Date(seen.t).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+      } else {
+        val.textContent = "—";
+        mt.textContent = "no data yet";
+      }
+    }
+    tile.append(lb, val, mt);
     tiles.appendChild(tile);
   }
 }
@@ -429,7 +711,7 @@ function renderChart() {
 
   const all = sources.flatMap(s => data[s]);
   if (!all.length) {
-    const t = mk("text", { x: W / 2, y: H / 2, "text-anchor": "middle", fill: "var(--text-muted)", "font-size": 13 });
+    const t = mk("text", { x: W / 2, y: H / 2, "text-anchor": "middle", fill: "var(--ink-3)", "font-size": 13 });
     t.textContent = "No history yet for this selection — check back after a few runs.";
     svg.appendChild(t);
     return;
@@ -443,25 +725,22 @@ function renderChart() {
   const x = (t) => padL + (t - t0) / (t1 - t0) * (W - padL - padR);
   const y = (v) => padT + (1 - (v - v0) / (v1 - v0)) * (H - padT - padB);
 
-  // y grid: clean steps
   const step = niceStep((v1 - v0) / 4);
   for (let v = Math.ceil(v0 / step) * step; v <= v1; v += step) {
     svg.appendChild(mk("line", { x1: padL, x2: W - padR, y1: y(v), y2: y(v), stroke: "var(--grid)", "stroke-width": 1 }));
-    const lbl = mk("text", { x: padL - 8, y: y(v) + 4, "text-anchor": "end", fill: "var(--text-muted)", "font-size": 11, style: "font-variant-numeric:tabular-nums" });
+    const lbl = mk("text", { x: padL - 8, y: y(v) + 4, "text-anchor": "end", fill: "var(--ink-3)", "font-size": 11, style: "font-variant-numeric:tabular-nums" });
     lbl.textContent = fmtCompact(v);
     svg.appendChild(lbl);
   }
-  // x ticks: ~5 time labels
   const nTicks = Math.min(5, Math.max(2, Math.floor(W / 160)));
   for (let i = 0; i <= nTicks; i++) {
     const t = t0 + (t1 - t0) * i / nTicks;
-    const lbl = mk("text", { x: x(t), y: H - 8, "text-anchor": "middle", fill: "var(--text-muted)", "font-size": 11 });
+    const lbl = mk("text", { x: x(t), y: H - 8, "text-anchor": "middle", fill: "var(--ink-3)", "font-size": 11 });
     lbl.textContent = fmtTick(new Date(t), t1 - t0);
     svg.appendChild(lbl);
   }
   svg.appendChild(mk("line", { x1: padL, x2: W - padR, y1: y(v0), y2: y(v0), stroke: "var(--axis)", "stroke-width": 1 }));
 
-  // series lines + end markers + endpoint labels (skip label on collision)
   const endYs = [];
   for (const s of sources) {
     const pts = data[s];
@@ -470,16 +749,15 @@ function renderChart() {
     svg.appendChild(mk("path", { d, fill: "none", stroke: c, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
     const last = pts[pts.length - 1];
     const ly = y(last.v);
-    svg.appendChild(mk("circle", { cx: x(+last.t), cy: ly, r: 4.5, fill: c, stroke: "var(--surface-1)", "stroke-width": 2 }));
+    svg.appendChild(mk("circle", { cx: x(+last.t), cy: ly, r: 4.5, fill: c, stroke: "var(--surface)", "stroke-width": 2 }));
     if (!endYs.some(e => Math.abs(e - ly) < 14)) {
-      const lbl = mk("text", { x: x(+last.t) + 10, y: ly + 4, fill: "var(--text-primary)", "font-size": 12, "font-weight": 650, style: "font-variant-numeric:tabular-nums" });
+      const lbl = mk("text", { x: x(+last.t) + 10, y: ly + 4, fill: "var(--ink)", "font-size": 12, "font-weight": 650, style: "font-variant-numeric:tabular-nums" });
       lbl.textContent = fmtMoney(last.v);
       svg.appendChild(lbl);
       endYs.push(ly);
     }
   }
 
-  // crosshair + tooltip
   const cross = mk("line", { y1: padT, y2: H - padB, stroke: "var(--axis)", "stroke-width": 1, visibility: "hidden" });
   svg.appendChild(cross);
   const timesSorted = [...new Set(ts)].sort((a, b) => a - b);
@@ -535,7 +813,7 @@ function renderMatrix() {
   const table = $("matrix");
   table.textContent = "";
   const { outbound, return: rets } = LATEST.dates;
-  const best = {}; // "o|r" -> quote
+  const best = {};
   for (const q of LATEST.quotes) {
     const k = q.out_date + "|" + q.ret_date;
     if (!(k in best) || q.price < best[k].price) best[k] = q;
@@ -549,14 +827,14 @@ function renderMatrix() {
   thead.appendChild(document.createElement("th"));
   for (const r of rets) {
     const th = document.createElement("th");
-    th.textContent = dayLabel(r).replace(" ", " ");
+    th.textContent = dayLabel(r).replace(/ /g, " ");
     thead.appendChild(th);
   }
   table.appendChild(thead);
 
   for (const o of outbound) {
     const tr = document.createElement("tr");
-    const th = document.createElement("th"); th.className = "rowh"; th.textContent = dayLabel(o);
+    const th = document.createElement("th"); th.className = "rowh"; th.textContent = dayLabel(o).replace(/ /g, " ");
     tr.appendChild(th);
     for (const r of rets) {
       const td = document.createElement("td");
@@ -565,7 +843,6 @@ function renderMatrix() {
         td.className = "empty"; td.textContent = "·";
       } else {
         const frac = hi === lo ? 0 : (q.price - lo) / (hi - lo);
-        // salience = expensive in both modes: light ramp low→high, dark ramp reversed so cheap recedes into the dark surface
         const idx = Math.round(frac * (RAMP.length - 1));
         const color = dark ? RAMP[RAMP.length - 1 - idx] : RAMP[idx];
         td.style.background = color;
@@ -609,19 +886,19 @@ function renderDeals() {
       const b = document.createElement("span"); b.className = "badge"; b.textContent = "Student";
       tdP.appendChild(b);
     }
-    const tdD = document.createElement("td"); tdD.textContent = dayLabel(q.out_date) + " → " + dayLabel(q.ret_date);
+    const tdD = document.createElement("td"); tdD.className = "dates"; tdD.textContent = dayLabel(q.out_date) + " → " + dayLabel(q.ret_date);
     const tdA = document.createElement("td"); tdA.textContent = (q.airlines || []).join(", ") || "—";
     const tdS = document.createElement("td");
     tdS.textContent = q.stops_out == null ? "—" : q.stops_out + (q.stops_in == null ? "" : " / " + q.stops_in);
     const tdT = document.createElement("td");
     tdT.textContent = q.duration_min ? Math.floor(q.duration_min / 60) + "h " + (q.duration_min % 60) + "m" : "—";
     const tdSrc = document.createElement("td");
-    const mark = document.createElement("span"); mark.className = "srcmark"; mark.style.background = srcColor(q.source);
+    const mark = document.createElement("span"); mark.className = "srcdot"; mark.style.background = srcColor(q.source); mark.style.marginRight = "7px";
     tdSrc.appendChild(mark); tdSrc.appendChild(document.createTextNode(q.source_name));
     const tdB = document.createElement("td");
     if (q.booking_url) {
       const a = document.createElement("a");
-      a.className = "book"; a.href = q.booking_url; a.target = "_blank"; a.rel = "noopener noreferrer";
+      a.className = "book"; a.style.marginTop = "0"; a.href = q.booking_url; a.target = "_blank"; a.rel = "noopener noreferrer";
       a.textContent = "Book ↗";
       tdB.appendChild(a);
     }
@@ -637,7 +914,7 @@ function render() {
   const adults = (TRIP.passengers || {}).adults || 1;
   const cabin = (TRIP.cabin || "economy").replace("-", " ");
   const subBits = [
-    "Round trip, " + cabin + ", " + adults + (adults > 1 ? " adults" : " adult") + ", prices in " + CUR.sym.trim() + " " + LATEST.currency,
+    "Round trip · " + cabin + " · " + adults + (adults > 1 ? " adults" : " adult") + " · " + CUR.sym.trim() + " " + LATEST.currency,
     "Out " + fmtWindow(TRIP.dates.outbound) + " · Return " + fmtWindow(TRIP.dates.return),
   ];
   if (hasStudent) subBits.push("Includes student fares");
@@ -645,18 +922,15 @@ function render() {
   sub.textContent = "";
   subBits.forEach((b, i) => {
     if (i) { const d = document.createElement("span"); d.className = "dot"; d.textContent = "·"; sub.appendChild(d); }
-    sub.appendChild(document.createTextNode(b));
+    const span = document.createElement("span");
+    if (i === 1) span.className = "mono";
+    span.textContent = b;
+    sub.appendChild(span);
   });
 
   const upd = new Date(LATEST.updated_at);
-  const updEl = $("updated");
-  updEl.textContent = "Last checked " + upd.toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) +
+  $("updated").textContent = "Last checked " + upd.toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) +
     " (your time) · checked hourly · " + HISTORY.length + " checks recorded";
-  if (!TRIP.active) {
-    const b = document.createElement("span"); b.className = "archived";
-    b.textContent = "Tracking ended — dates have passed";
-    updEl.appendChild(b);
-  }
 
   renderTiles();
   renderChart();
@@ -672,6 +946,249 @@ function render() {
     " Data refreshes hourly via GitHub Actions.";
 }
 
+/* ---------- new-trip form ---------- */
+const dlg = $("tripDlg");
+
+function setupAutocomplete(boxId) {
+  const box = $(boxId);
+  const input = box.querySelector("input");
+  const list = box.querySelector(".ac-list");
+  let hl = -1;
+
+  const pick = (a) => {
+    input.value = a[0];
+    input.dataset.code = a[0]; input.dataset.city = a[1]; input.dataset.country = a[2]; input.dataset.cc = a[3];
+    close();
+  };
+  const close = () => { list.hidden = true; list.textContent = ""; hl = -1; };
+  const open = (matches) => {
+    list.textContent = ""; hl = -1;
+    for (const a of matches.slice(0, 8)) {
+      const b = document.createElement("button");
+      b.type = "button";
+      const code = document.createElement("span"); code.className = "code"; code.textContent = a[0];
+      const place = document.createElement("span"); place.className = "place";
+      place.innerHTML = "";
+      place.appendChild(document.createTextNode(a[1] + " "));
+      const small = document.createElement("small"); small.textContent = a[2];
+      place.appendChild(small);
+      b.append(code, place);
+      b.onmousedown = (e) => { e.preventDefault(); pick(a); };
+      list.appendChild(b);
+    }
+    list.hidden = !matches.length;
+  };
+
+  input.addEventListener("input", () => {
+    delete input.dataset.code;
+    const q = input.value.trim().toLowerCase();
+    if (q.length < 2) { close(); return; }
+    const starts = AIRPORTS.filter(a => a[0].toLowerCase().startsWith(q) || a[1].toLowerCase().startsWith(q));
+    const contains = AIRPORTS.filter(a => !starts.includes(a) && (a[1].toLowerCase().includes(q) || a[2].toLowerCase().startsWith(q)));
+    open(starts.concat(contains));
+  });
+  input.addEventListener("keydown", (e) => {
+    const items = [...list.children];
+    if (!items.length) return;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      hl = (hl + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+      items.forEach((el, i) => el.classList.toggle("hl", i === hl));
+    } else if (e.key === "Enter" && hl >= 0) {
+      e.preventDefault();
+      items[hl].dispatchEvent(new MouseEvent("mousedown"));
+    } else if (e.key === "Escape") close();
+  });
+  input.addEventListener("blur", () => setTimeout(close, 120));
+  return input;
+}
+
+const fromInp = setupAutocomplete("acFrom");
+const toInp = setupAutocomplete("acTo");
+
+function airportOf(input) {
+  if (input.dataset.code) {
+    return { code: input.dataset.code, city: input.dataset.city, country: input.dataset.country, cc: input.dataset.cc };
+  }
+  const raw = input.value.trim().toUpperCase();
+  if (/^[A-Z]{3}$/.test(raw)) {
+    const known = AIRPORTS.find(a => a[0] === raw);
+    return known ? { code: known[0], city: known[1], country: known[2], cc: known[3] }
+                 : { code: raw, city: raw, country: "", cc: "" };
+  }
+  return null;
+}
+
+$("swapBtn").onclick = () => {
+  const f = { v: fromInp.value, d: { ...fromInp.dataset } };
+  fromInp.value = toInp.value; Object.assign(fromInp.dataset, toInp.dataset);
+  toInp.value = f.v; Object.assign(toInp.dataset, f.d);
+};
+
+function status(msg, cls) {
+  const el = $("formStatus");
+  el.textContent = msg;
+  el.className = cls || "";
+}
+
+function refreshTokenUI() {
+  const has = !!localStorage.getItem("gh_token");
+  $("tokenSaved").style.display = has ? "" : "none";
+  $("tokenRow").classList.toggle("show", !has);
+}
+$("forgetTok").onclick = () => { localStorage.removeItem("gh_token"); refreshTokenUI(); };
+
+$("newTripBtn").onclick = () => {
+  status("", "");
+  refreshTokenUI();
+  const today = new Date();
+  $("outStart").min = $("outEnd").min = $("retStart").min = $("retEnd").min = today.toISOString().slice(0, 10);
+  dlg.showModal();
+};
+$("dlgClose").onclick = () => dlg.close();
+
+function readForm() {
+  const from = airportOf(fromInp), to = airportOf(toInp);
+  if (!from || !to) return { err: "Pick both airports — start typing a city and choose from the list (or enter a 3-letter code)." };
+  if (from.code === to.code) return { err: "From and To are the same airport." };
+  const oS = $("outStart").value, oE = $("outEnd").value || oS;
+  const rS = $("retStart").value, rE = $("retEnd").value || rS;
+  if (!oS || !rS) return { err: "Set a depart date and a return date." };
+  if (oE < oS) return { err: "The depart range ends before it starts." };
+  if (rE < rS) return { err: "The return range ends before it starts." };
+  if (rS < oS) return { err: "The return dates start before the depart dates." };
+  const today = new Date().toISOString().slice(0, 10);
+  if (oS < today) return { err: "The depart date is in the past." };
+  const gridDays = (d1, d2) => (new Date(d2) - new Date(d1)) / 864e5 + 1;
+  if (gridDays(oS, oE) * gridDays(rS, rE) > 120) return { err: "That's over 120 date combinations — narrow the ranges so hourly checks stay fast." };
+
+  const currency = $("curSel").value;
+  const cabin = $("cabinSel").value;
+  const adults = Math.max(1, Math.min(9, Number($("adultsInp").value) || 1));
+  const range = (s, e) => s === e ? s : { start: s, end: e };
+  const id = (from.code + "-" + to.code + "-" + oS.slice(0, 7).replace("-", "")).toLowerCase();
+
+  const trip = {
+    id,
+    route: {
+      origin: from.code, destination: to.code,
+      origin_city: from.city, destination_city: to.city,
+      origin_country: from.country, destination_country: to.country,
+    },
+    dates: { outbound: range(oS, oE), return: range(rS, rE) },
+    currency,
+  };
+  if (cabin !== "economy") trip.cabin = cabin;
+  if (adults !== 1) trip.passengers = { adults };
+  if (currency === "INR") { trip.google = { market: "IN" }; trip.kiwi = { market: "in" }; }
+  else if (from.cc) { trip.google = { market: from.cc }; trip.kiwi = { market: from.cc.toLowerCase() }; }
+  return { trip };
+}
+
+const b64encode = (s) => btoa(String.fromCharCode(...new TextEncoder().encode(s)));
+const b64decode = (s) => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g, "")), c => c.charCodeAt(0)));
+
+async function commitTrip(trip, token) {
+  const url = "https://api.github.com/repos/" + REPO + "/contents/config.json";
+  const headers = { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" };
+  const r = await fetch(url, { headers });
+  if (r.status === 401 || r.status === 403) throw new Error("GitHub rejected the token — check it has Contents: read & write on this repository.");
+  if (!r.ok) throw new Error("Could not read config.json from GitHub (" + r.status + ").");
+  const file = await r.json();
+  const cfg = JSON.parse(b64decode(file.content));
+  let id = trip.id, n = 2;
+  while (cfg.trips.some(t => (t.id || "") === id)) id = trip.id + "-" + n++;
+  trip.id = id;
+  cfg.trips.push(trip);
+  const put = await fetch(url, {
+    method: "PUT",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: "track " + trip.route.origin + "-" + trip.route.destination + " (" + id + ") via dashboard",
+      content: b64encode(JSON.stringify(cfg, null, 2) + "\n"),
+      sha: file.sha,
+    }),
+  });
+  if (!put.ok) {
+    const detail = (await put.json().catch(() => ({}))).message || put.status;
+    throw new Error("GitHub rejected the commit: " + detail);
+  }
+  return id;
+}
+
+let pollTimer = null;
+function pollForTrip(id) {
+  clearInterval(pollTimer);
+  let tries = 0;
+  pollTimer = setInterval(async () => {
+    if (++tries > 25) { clearInterval(pollTimer); return; }
+    try {
+      const r = await fetch("data/index.json?t=" + Date.now());
+      if (!r.ok) return;
+      const idx = await r.json();
+      if (idx.trips.some(t => t.id === id)) {
+        clearInterval(pollTimer);
+        INDEX = idx;
+        localStorage.setItem("trip", id);
+        history.replaceState(null, "", "#" + id);
+        buildRouteTabs();
+        toast("First prices for " + id.toUpperCase().split("-").slice(0, 2).join("–") + " are in.");
+        loadTrip(id).catch(() => {});
+      }
+    } catch { /* transient — keep polling */ }
+  }, 40000);
+}
+
+function toast(msg, ms) {
+  const el = $("toast");
+  el.textContent = msg;
+  el.style.display = "block";
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.display = "none"; }, ms || 6000);
+}
+
+$("tripForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const { trip, err } = readForm();
+  if (err) { status(err, "err"); return; }
+  let token = localStorage.getItem("gh_token");
+  if (!token) {
+    token = $("tokenInp").value.trim();
+    if (!token) {
+      $("tokenRow").classList.add("show");
+      status("Add a GitHub token so the dashboard can save the trip to the tracker — or use “Copy config snippet”.", "err");
+      $("tokenInp").focus();
+      return;
+    }
+  }
+  const btn = $("startBtn");
+  btn.disabled = true;
+  status("Saving trip to the tracker…", "");
+  try {
+    const id = await commitTrip(trip, token);
+    localStorage.setItem("gh_token", token);
+    refreshTokenUI();
+    status("", "");
+    dlg.close();
+    toast("Tracking " + trip.route.origin + " ⇄ " + trip.route.destination + " — first prices usually land in 5–10 minutes.", 9000);
+    pollForTrip(id);
+  } catch (ex) {
+    status(ex.message, "err");
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+$("copyBtn").onclick = async () => {
+  const { trip, err } = readForm();
+  if (err) { status(err, "err"); return; }
+  const snippet = JSON.stringify(trip, null, 2);
+  try { await navigator.clipboard.writeText(snippet); } catch { /* fall through to showing the link */ }
+  status("Copied. Paste it into the \"trips\" list in config.json on GitHub — tracking starts on commit.", "ok");
+  window.open("https://github.com/" + REPO + "/edit/main/config.json", "_blank", "noopener");
+};
+
+/* ---------- boot ---------- */
 $("rangeSeg").addEventListener("click", (e) => {
   const btn = e.target.closest("button");
   if (!btn) return;
