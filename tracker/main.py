@@ -107,10 +107,10 @@ def best_per_source_pair(quotes) -> dict:
     return best
 
 
-def write_index(trips, now_iso):
+def write_index(trips):
+    # deterministic (no timestamp) so unchanged config produces no git churn
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     index = {
-        "updated_at": now_iso,
         "trips": [
             {
                 "id": t["id"],
@@ -162,7 +162,7 @@ def main():
     now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     trips = load_trips(config)
-    write_index(trips, now_iso)
+    write_index(trips)
 
     active = [t for t in trips if t["active"]]
     for t in trips:
