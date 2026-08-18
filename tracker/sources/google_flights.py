@@ -54,6 +54,14 @@ def _build_query(origin, destination, out_date, ret_date, adults, cabin, currenc
     )
 
 
+def _spread(items: list, n: int) -> list:
+    """Pick n items evenly spread across the list."""
+    if len(items) <= n:
+        return items
+    step = (len(items) - 1) / (n - 1)
+    return [items[round(i * step)] for i in range(n)]
+
+
 def _fetch_pair(query, market) -> list:
     url = query.url() + f"&gl={market}"
     last_err = None
@@ -82,6 +90,10 @@ def fetch(config) -> list[Quote]:
 
     quotes = []
     pairs = [(o, r) for o in config["dates"]["outbound"] for r in config["dates"]["return"]]
+    max_pairs = config["google"].get("max_pairs", 60)
+    if len(pairs) > max_pairs:
+        log.warning("google: %d date pairs exceeds max_pairs=%d, sampling evenly", len(pairs), max_pairs)
+        pairs = _spread(pairs, max_pairs)
     for i, (out_date, ret_date) in enumerate(pairs):
         query = _build_query(route["origin"], route["destination"], out_date, ret_date,
                              adults, cabin, currency)

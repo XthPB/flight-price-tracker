@@ -167,11 +167,13 @@ def _best_per_date(client, org, dest, dates, fare, delay) -> dict:
 def _booking_url(route, out_date, ret_date, student: bool) -> str:
     org, dest = route["origin"], route["destination"]
     org_city, dest_city = route["origin_city"], route["destination_city"]
+    org_country = route.get("origin_country", "")
+    dest_country = route.get("destination_country", "")
     ar = "Student" if student else "undefined"
     return (
         "https://flight.easemytrip.com/FlightList/Index"
-        f"?srch={org}-{org_city}-Netherlands|{dest}-{dest_city}-India|{_ddmmyyyy(out_date)}"
-        f"&rtn={dest}-{dest_city}-India|{org}-{org_city}-Netherlands|{_ddmmyyyy(ret_date)}"
+        f"?srch={org}-{org_city}-{org_country}|{dest}-{dest_city}-{dest_country}|{_ddmmyyyy(out_date)}"
+        f"&rtn={dest}-{dest_city}-{dest_country}|{org}-{org_city}-{org_country}|{_ddmmyyyy(ret_date)}"
         f"&px=1-0-0&cbn=0&ar={ar}&isow=false&isdm=true&lng=&IsDoubleSeat=false"
         "&CCODE=IN&curr=INR&apptype=B2C"
     )

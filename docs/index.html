@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AMS ⇄ DEL · Flight Price Tracker</title>
+<title>Flight Price Tracker</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
 <style>
 :root {
@@ -81,9 +81,15 @@ h1 { font-size: 22px; font-weight: 650; letter-spacing: -0.01em; }
   color: var(--text-secondary); cursor: pointer;
 }
 .seg button[aria-pressed="true"] { background: var(--grid); color: var(--text-primary); font-weight: 600; }
-select#pairSel {
+select#pairSel, select#routeSel {
   background: var(--surface-1); border: 1px solid var(--border); color: var(--text-primary);
   border-radius: 8px; padding: 6px 8px; font: inherit; font-size: 13px;
+}
+.hright { display: flex; gap: 8px; align-items: center; flex: none; }
+.archived {
+  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--bad); border: 1px solid var(--bad);
+  border-radius: 5px; padding: 1px 7px; margin-left: 8px; vertical-align: 2px;
 }
 
 .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 22px; }
@@ -147,10 +153,13 @@ footer a { color: var(--text-secondary); }
 <div class="wrap">
   <header>
     <div>
-      <h1>Amsterdam ⇄ New Delhi · flight price tracker</h1>
-      <div class="sub" id="routeSub">Round trip, economy, 1 adult, prices in ₹ INR<span class="dot">·</span>Out Aug 8–14 · Return Aug 24–31, 2026<span class="dot">·</span>Includes student fares</div>
+      <h1 id="routeTitle">Flight price tracker</h1>
+      <div class="sub" id="routeSub"></div>
     </div>
-    <button id="themeBtn" aria-label="Toggle theme">◐ Theme</button>
+    <div class="hright">
+      <select id="routeSel" aria-label="Tracked trip" style="display:none"></select>
+      <button id="themeBtn" aria-label="Toggle theme">◐ Theme</button>
+    </div>
   </header>
   <div class="updated" id="updated">Loading…</div>
 
@@ -173,7 +182,7 @@ footer a { color: var(--text-secondary); }
 
     <div class="card">
       <h2>Price history</h2>
-      <div class="desc">Cheapest round-trip found by each source at every hourly check (₹ INR).</div>
+      <div class="desc">Cheapest round-trip found by each source at every hourly check.</div>
       <div class="legend" id="legend"></div>
       <div id="chartBox">
         <svg id="chart" role="img" aria-label="Price history line chart"></svg>
@@ -185,7 +194,7 @@ footer a { color: var(--text-secondary); }
       <h2>Current prices by date pair</h2>
       <div class="desc">Cheapest current round-trip across all sources for each outbound (rows) × return (columns) combination. Darker means more expensive; the boxed cell is the best deal.</div>
       <div class="matrix-scroll"><table class="matrix" id="matrix"></table></div>
-      <div class="axis-note">Rows: outbound date (Aug 2026) · Columns: return date (Aug 2026) · Hover a cell for details.</div>
+      <div class="axis-note">Rows: outbound date · Columns: return date · Hover a cell for details.</div>
     </div>
 
     <div class="card">
@@ -212,16 +221,24 @@ const SOURCE_META = {
 // sequential blue ramp (palette steps 100..700) for the price matrix
 const RAMP = ["#cde2fb","#b7d3f6","#9ec5f4","#86b6ef","#6da7ec","#5598e7","#3987e5","#2a78d6","#256abf","#1c5cab","#184f95","#104281","#0d366b"];
 
-let LATEST = null, HISTORY = [], rangeDays = 0, pairFilter = "";
+let INDEX = null, TRIP = null, LATEST = null, HISTORY = [], rangeDays = 0, pairFilter = "";
 
 const $ = (id) => document.getElementById(id);
-const CURRENCIES = { INR: { sym: "₹", locale: "en-IN" }, EUR: { sym: "€", locale: "en-US" }, USD: { sym: "$", locale: "en-US" } };
-let CUR = CURRENCIES.INR;
+const CURRENCIES = { INR: { sym: "₹", locale: "en-IN" }, EUR: { sym: "€", locale: "en-US" }, USD: { sym: "$", locale: "en-US" }, GBP: { sym: "£", locale: "en-GB" } };
+let CUR = CURRENCIES.EUR;
 const fmtMoney = (v) => CUR.sym + Math.round(v).toLocaleString(CUR.locale);
 const fmtCompact = (v) => v >= 10000 ? CUR.sym + (v / 1000).toFixed(v >= 100000 ? 0 : 1) + "k" : fmtMoney(v);
 const srcColor = (s) => getComputedStyle(document.documentElement).getPropertyValue((SOURCE_META[s] || {}).cssVar || "--text-muted").trim();
-const dayLabel = (iso) => { const d = new Date(iso + "T12:00:00Z"); return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", timeZone: "UTC" }); };
-const shortDate = (iso) => iso.slice(8); // "2026-08-10" -> "10"
+const dayLabel = (iso) => { const d = new Date(iso + "T12:00:00Z"); return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }); };
+const routeLabel = (t) => (t.route.origin_city || t.route.origin) + " ⇄ " + (t.route.destination_city || t.route.destination);
+function fmtWindow(dates) {
+  const a = new Date(dates[0] + "T12:00:00Z"), b = new Date(dates[dates.length - 1] + "T12:00:00Z");
+  const dm = (d) => d.toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+  if (dates.length === 1) return dm(a) + " " + a.getUTCFullYear();
+  return (a.getUTCMonth() === b.getUTCMonth() && a.getUTCFullYear() === b.getUTCFullYear()
+    ? a.getUTCDate() + "–" + dm(b)
+    : dm(a) + " – " + dm(b)) + " " + b.getUTCFullYear();
+}
 
 /* ---------- theme ---------- */
 function initTheme() {
@@ -237,16 +254,69 @@ function initTheme() {
 }
 
 /* ---------- data ---------- */
+const bust = () => "?t=" + Math.floor(Date.now() / 60000);
+
 async function load() {
-  const bust = "?t=" + Math.floor(Date.now() / 60000);
-  const [latest, history] = await Promise.all([
-    fetch("data/latest.json" + bust).then(r => r.json()),
-    fetch("data/history.json" + bust).then(r => r.json()),
+  const r = await fetch("data/index.json" + bust());
+  if (!r.ok) throw new Error("index.json " + r.status);
+  INDEX = await r.json();
+  buildRouteSelect();
+  await loadTrip(pickTripId());
+}
+
+function pickTripId() {
+  const ids = INDEX.trips.map(t => t.id);
+  const want = location.hash.slice(1) || localStorage.getItem("trip");
+  if (ids.includes(want)) return want;
+  const firstActive = INDEX.trips.find(t => t.active);
+  return (firstActive || INDEX.trips[0]).id;
+}
+
+function buildRouteSelect() {
+  const sel = $("routeSel");
+  sel.textContent = "";
+  for (const t of INDEX.trips) {
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = routeLabel(t) + (t.active ? "" : " (ended)");
+    sel.appendChild(opt);
+  }
+  sel.style.display = INDEX.trips.length > 1 ? "" : "none";
+  sel.onchange = () => {
+    localStorage.setItem("trip", sel.value);
+    history.replaceState(null, "", "#" + sel.value);
+    loadTrip(sel.value).catch(err => { $("loading").textContent = "Failed to load data: " + err.message; });
+  };
+}
+
+async function loadTrip(id) {
+  const silent = LATEST && TRIP && TRIP.id === id; // periodic refresh: update in place
+  TRIP = INDEX.trips.find(t => t.id === id);
+  $("routeSel").value = id;
+  document.title = routeLabel(TRIP) + " · Flight Price Tracker";
+  $("routeTitle").textContent = routeLabel(TRIP) + " · flight price tracker";
+  if (!silent) {
+    $("app").style.display = "none";
+    $("loading").style.display = "";
+    $("loading").textContent = "Fetching latest prices…";
+  }
+  const [rl, rh] = await Promise.all([
+    fetch("data/" + id + "/latest.json" + bust()),
+    fetch("data/" + id + "/history.json" + bust()),
   ]);
-  LATEST = latest; HISTORY = history;
-  CUR = CURRENCIES[latest.currency] || CURRENCIES.INR;
+  if (!rl.ok || !rh.ok) {
+    $("routeSub").textContent = "";
+    $("updated").textContent = "";
+    $("loading").textContent = TRIP.active
+      ? "No data yet for this trip — the first check should land within the hour."
+      : "No data was recorded for this trip.";
+    return;
+  }
+  LATEST = await rl.json(); HISTORY = await rh.json();
+  CUR = CURRENCIES[LATEST.currency] || { sym: LATEST.currency + " ", locale: "en-US" };
   $("loading").style.display = "none";
   $("app").style.display = "";
+  pairFilter = "";
   buildPairSelect();
   render();
 }
@@ -260,6 +330,8 @@ function activeSources() {
 
 function buildPairSelect() {
   const sel = $("pairSel");
+  while (sel.options.length > 1) sel.remove(1);
+  sel.value = "";
   LATEST.dates.outbound.forEach(o => LATEST.dates.return.forEach(r => {
     const opt = document.createElement("option");
     opt.value = o + "|" + r;
@@ -560,17 +632,44 @@ function renderDeals() {
 
 /* ---------- top-level ---------- */
 function render() {
+  const sources = activeSources();
+  const hasStudent = sources.includes("easemytrip-student");
+  const adults = (TRIP.passengers || {}).adults || 1;
+  const cabin = (TRIP.cabin || "economy").replace("-", " ");
+  const subBits = [
+    "Round trip, " + cabin + ", " + adults + (adults > 1 ? " adults" : " adult") + ", prices in " + CUR.sym.trim() + " " + LATEST.currency,
+    "Out " + fmtWindow(TRIP.dates.outbound) + " · Return " + fmtWindow(TRIP.dates.return),
+  ];
+  if (hasStudent) subBits.push("Includes student fares");
+  const sub = $("routeSub");
+  sub.textContent = "";
+  subBits.forEach((b, i) => {
+    if (i) { const d = document.createElement("span"); d.className = "dot"; d.textContent = "·"; sub.appendChild(d); }
+    sub.appendChild(document.createTextNode(b));
+  });
+
   const upd = new Date(LATEST.updated_at);
-  $("updated").textContent = "Last checked " + upd.toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) +
+  const updEl = $("updated");
+  updEl.textContent = "Last checked " + upd.toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) +
     " (your time) · checked hourly · " + HISTORY.length + " checks recorded";
+  if (!TRIP.active) {
+    const b = document.createElement("span"); b.className = "archived";
+    b.textContent = "Tracking ended — dates have passed";
+    updEl.appendChild(b);
+  }
+
   renderTiles();
   renderChart();
   renderMatrix();
   renderDeals();
-  $("foot").textContent = "Sources: " + activeSources().map(s => SOURCE_META[s].name).join(", ") +
-    ". Prices are the total for 1 adult round trip in " + (LATEST.currency || "INR") +
-    " and can change by the time you book. EaseMyTrip round trips are the sum of its two one-way fares (its own booking flow prices them that way). " +
-    "Student fares need a valid student ID at booking and apply only on airlines that offer them. Data refreshes hourly via GitHub Actions.";
+  $("foot").textContent = "Sources: " + sources.map(s => SOURCE_META[s].name).join(", ") +
+    ". Prices are the total for " + adults + (adults > 1 ? " adults" : " adult") + " round trip in " + (LATEST.currency || "EUR") +
+    " and can change by the time you book." +
+    (sources.some(s => s.startsWith("easemytrip"))
+      ? " EaseMyTrip round trips are the sum of its two one-way fares (its own booking flow prices them that way)." : "") +
+    (hasStudent
+      ? " Student fares need a valid student ID at booking and apply only on airlines that offer them." : "") +
+    " Data refreshes hourly via GitHub Actions.";
 }
 
 $("rangeSeg").addEventListener("click", (e) => {

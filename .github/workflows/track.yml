@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: "23 * * * *"   # hourly, off the top-of-hour rush
   workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - config.json
+      - "tracker/**"
+      - .github/workflows/track.yml
 
 concurrency:
   group: track
